@@ -130,4 +130,23 @@ describe("validateTemplate", () => {
     writeFileSync(join(dir, "SKILL.md"), read(join(dir, "SKILL.md")) + "\nWrite to /workspace/tmp/notes.txt.\n");
     expect(has(validateTemplate(dir), /\/workspace\/tmp\/notes\.txt/)).toBe(true);
   });
+
+  it("rejects em-dash in any text file", () => {
+    const [, dir] = fixture();
+    writeFileSync(join(dir, "evals/evals.json"), JSON.stringify({ evals: [{ prompt: "a \u2014 b", files: [], expectations: [] }] }));
+    expect(has(validateTemplate(dir), /evals\/evals\.json contains an em-dash/)).toBe(true);
+    const [, d2] = fixture();
+    mkdirSync(join(d2, "references"));
+    writeFileSync(join(d2, "references/x.md"), "a \u2014 b\n");
+    expect(has(validateTemplate(d2), /references\/x\.md contains an em-dash/)).toBe(true);
+  });
+
+  it("applies the workspace path rules to references/*.md", () => {
+    const [, dir] = fixture();
+    mkdirSync(join(dir, "references"));
+    writeFileSync(join(dir, "references/x.md"), "See /workspace/tmp/a.txt\n\n```\nls /workspace/inputs/\n```\n");
+    const errs = validateTemplate(dir);
+    expect(has(errs, /references\/x\.md: \/workspace\/tmp\/a\.txt/)).toBe(true);
+    expect(has(errs, /references\/x\.md: .*fenced/)).toBe(true);
+  });
 });

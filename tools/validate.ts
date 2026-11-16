@@ -6,6 +6,7 @@ import { parseWorkflowMeta } from "./vendor/workflow-meta";
 
 export const LIMITS = { files: 40, templateBytes: 2 * 1024 * 1024, fileBytes: 1024 * 1024 };
 export const LICENSES = ["Apache-2.0", "MIT", "BSD-2-Clause", "BSD-3-Clause", "CC-BY-4.0"];
+const TEXT_EXT = /\.(md|txt|json|py|js|ts|csv|tsv|ya?ml|html|css|svg|xml)$/i;
 const PREFIXES = ["/workspace/workflow/", "/workspace/inputs/", "/workspace/out/", "/workspace/knowledge/"];
 
 const schema = JSON.parse(readFileSync(resolve(import.meta.dirname, "schema/template.schema.json"), "utf8"));
@@ -96,7 +97,11 @@ export function validateTemplate(dir: string): string[] {
       if (Array.isArray(tpl.needs.connections) && !sameSet(tpl.needs.connections, meta.connections ?? []))
         errors.push(`needs.connections [${tpl.needs.connections}] must equal the SKILL.md frontmatter connections [${meta.connections ?? []}]`);
     }
-    checkWorkspacePaths(md, has, errors);
+    checkWorkspacePaths(md, has, errors, "SKILL.md");
+  }
+  for (const rel of has) {
+    if (rel.startsWith("references/") && rel.endsWith(".md")) checkWorkspacePaths(readFileSync(join(dir, rel), "utf8"), has, errors, rel);
+    if (TEXT_EXT.test(rel) && readFileSync(join(dir, rel), "utf8").includes("\u2014")) errors.push(`${rel} contains an em-dash`);
   }
 
   // evals
@@ -125,7 +130,7 @@ export function validateTemplate(dir: string): string[] {
 }
 
 /** Workflow paths in SKILL.md: only the four prefixes, /workspace/inputs/ never fenced, workflow files must exist. */
-function checkWorkspacePaths(md: string, has: Set<string>, errors: string[]) {
+function checkWorkspacePaths(md: string, has: Set<string>, errors: string[], label: string) {
   let fenced = false;
   const seen = new Set<string>();
   for (const line of md.replace(/\r\n/g, "\n").split("\n")) {
@@ -137,19 +142,19 @@ function checkWorkspacePaths(md: string, has: Set<string>, errors: string[]) {
       const p = m[0].replace(/[.,;:)]+$/, "");
       const prefix = PREFIXES.find((x) => p.startsWith(x) || p + "/" === x);
       if (!prefix) {
-        if (!seen.has(`o:${p}`)) errors.push(`SKILL.md: ${p} is not one of ${PREFIXES.join(", ")}`);
+        if (!seen.has(`o:${p}`)) errors.push(`${label}: ${p} is not one of ${PREFIXES.join(", ")}`);
         seen.add(`o:${p}`);
         continue;
       }
       if (prefix === "/workspace/inputs/" && fenced && !seen.has("fence")) {
         seen.add("fence");
-        errors.push("SKILL.md: /workspace/inputs/ must not appear inside a fenced code block");
+        errors.push(`${label}: /workspace/inputs/ must not appear inside a fenced code block`);
       }
       if (prefix === "/workspace/workflow/" && p.length > prefix.length && !seen.has(`w:${p}`)) {
         seen.add(`w:${p}`);
         const rel = p.slice(prefix.length);
         const ok = rel.endsWith("/") ? [...has].some((f) => f.startsWith(rel)) : has.has(rel);
-        if (!ok) errors.push(`SKILL.md: ${p} is not in the template (${rel})`);
+        if (!ok) errors.push(`${label}: ${p} is not in the template (${rel})`);
       }
     }
   }

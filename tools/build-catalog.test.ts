@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { buildCatalog } from "./build-catalog";
+import { buildCatalog, writeCatalog } from "./build-catalog";
 import { fixture } from "./test-helpers";
 
 describe("buildCatalog", () => {
@@ -38,5 +38,16 @@ describe("buildCatalog", () => {
     mk("a-sales", "Alpha", "sales");
     mk("z-legal", "Zed", "legal");
     expect(buildCatalog(root, "x").templates.map((t) => t.slug)).toEqual(["hello-template", "z-legal", "a-sales", "b-sales"]);
+  });
+
+  it("leaves catalog.json untouched when only the commit differs", () => {
+    const [root, dir] = fixture();
+    expect(writeCatalog(root, "c1")).toBe(true);
+    const first = readFileSync(join(root, "catalog.json"), "utf8");
+    expect(writeCatalog(root, "c2")).toBe(false);
+    expect(readFileSync(join(root, "catalog.json"), "utf8")).toBe(first);
+    writeFileSync(join(dir, "samples/hello.txt"), "changed\n");
+    expect(writeCatalog(root, "c3")).toBe(true);
+    expect(JSON.parse(readFileSync(join(root, "catalog.json"), "utf8")).commit).toBe("c3");
   });
 });

@@ -1,7 +1,8 @@
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
+import { isDeepStrictEqual } from "node:util";
 import { pathToFileURL } from "node:url";
 import { parseWorkflowMeta } from "./vendor/workflow-meta";
 
@@ -65,10 +66,24 @@ export function buildCatalog(root: string, commit: string): Catalog {
   return { version: 1, commit, builtAt: new Date().toISOString(), categories, templates };
 }
 
+/** Writes catalog.json unless the existing one has the same templates and categories (then builtAt and commit stay). True when written. */
+export function writeCatalog(root: string, commit: string): boolean {
+  const cat = buildCatalog(root, commit);
+  const file = join(root, "catalog.json");
+  if (existsSync(file)) {
+    try {
+      const old = JSON.parse(readFileSync(file, "utf8"));
+      if (isDeepStrictEqual(old.templates, cat.templates) && isDeepStrictEqual(old.categories, cat.categories)) return false;
+    } catch {
+      // unreadable: rewrite it
+    }
+  }
+  writeFileSync(file, JSON.stringify(cat, null, 2) + "\n");
+  return true;
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const root = resolve(dirname(process.argv[1]), "..");
   const commit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
-  const cat = buildCatalog(root, commit);
-  writeFileSync(join(root, "catalog.json"), JSON.stringify(cat, null, 2) + "\n");
-  console.log(`catalog.json: ${cat.templates.length} template(s) at ${commit.slice(0, 8)}`);
+  console.log(writeCatalog(root, commit) ? `catalog.json rebuilt at ${commit.slice(0, 8)}` : "catalog.json unchanged");
 }
