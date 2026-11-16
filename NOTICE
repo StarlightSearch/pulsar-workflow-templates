@@ -14,3 +14,4 @@ This product includes templates adapted from the sources below. One line per ada
 - templates/prospect-brief: adapted from anthropics/knowledge-work-plugins, sales/skills/account-research and sales/skills/draft-outreach (https://github.com/anthropics/knowledge-work-plugins/tree/main/sales), Apache-2.0.
 - templates/prospect-brief: adapted from coreyhaines31/marketingskills, skills/cold-email (https://github.com/coreyhaines31/marketingskills/tree/main/skills/cold-email), MIT.
 - templates/page-audit: adapted from coreyhaines31/marketingskills, skills/seo-audit and skills/copywriting (https://github.com/coreyhaines31/marketingskills/tree/main/skills), MIT.
+- templates/competitor-profile: adapted from coreyhaines31/marketingskills, skills/competitor-profiling (https://github.com/coreyhaines31/marketingskills/tree/main/skills/competitor-profiling), MIT.
