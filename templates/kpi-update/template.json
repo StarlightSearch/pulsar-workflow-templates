@@ -1,0 +1,12 @@
+{
+  "slug": "kpi-update",
+  "title": "KPI update",
+  "category": "finance-data",
+  "summary": "Turns a weekly or monthly metrics export into a short update: what changed, what moved and the likely driver, with a chart and a workbook.",
+  "takes": "A metrics CSV or Excel file",
+  "gives": "A written update, a chart and a workbook",
+  "icon": "chart",
+  "source": { "name": "xlsx", "repo": "anthropics/skills", "path": "skills/xlsx", "license": "Apache-2.0" },
+  "needs": { "web": false, "connections": [], "secrets": [] },
+  "targets": ["workflows", "pulsar"]
+}
