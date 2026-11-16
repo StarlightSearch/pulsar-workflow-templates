@@ -77,7 +77,7 @@ Work out first, and write it down: the page type, who it speaks to, and its one 
 - **Benefits and objections**: features tied to outcomes; the obvious doubts (price, effort to switch, security, "will this work for me") answered on the page or one click away.
 - **Flow and clarity**: one idea per section, plain words, active voice, the customer's language rather than internal jargon, one clear next step at the end.
 
-For each copy finding, quote the exact text from the page and give a rewrite. Rewrites keep the page's own facts and voice: never invent a statistic, customer or guarantee; where the page lacks the fact a better line needs, write `[NEED: ...]` (for example `[NEED: number of teams using it]`). Also note two or three things the page does well, so they are kept.
+For each copy finding, quote the exact text from the page and give a rewrite. Rewrites keep the page's own facts and voice: a rewrite states only what the page itself says, and never invents a statistic, customer, guarantee or policy. Where it needs a fact the page does not give, even a likely one (whether a card is needed for the trial, which fees apply), write `[NEED: ...]` instead (for example `[NEED: number of teams using it]`). Judge a claim on the page by whether a visitor can check it, not by what you believe is true outside the page. Also note two or three things the page does well, so they are kept.
 
 ### 4. Prioritise
 
