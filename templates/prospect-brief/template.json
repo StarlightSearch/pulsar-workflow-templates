@@ -1,0 +1,12 @@
+{
+  "slug": "prospect-brief",
+  "title": "Prospect brief",
+  "category": "sales",
+  "summary": "Researches a prospect from its own website: a sourced brief with signals, fit and outreach hooks, plus a short first email that uses them.",
+  "takes": "A company website and a line on what you sell",
+  "gives": "A sourced brief and a first email draft",
+  "icon": "search",
+  "source": { "name": "account-research", "repo": "anthropics/knowledge-work-plugins", "path": "sales/skills/account-research", "license": "Apache-2.0" },
+  "needs": { "web": true, "connections": [], "secrets": [] },
+  "targets": ["workflows", "pulsar"]
+}

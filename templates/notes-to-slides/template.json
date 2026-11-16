@@ -1,0 +1,12 @@
+{
+  "slug": "notes-to-slides",
+  "title": "Notes to slides",
+  "category": "presentations",
+  "summary": "Turns rough meeting notes into a designed PowerPoint deck with a clear storyline, big numbers, a chart and speaker notes.",
+  "takes": "Notes as Markdown or text",
+  "gives": "A PowerPoint deck with speaker notes",
+  "icon": "slides",
+  "source": { "name": "pptx", "repo": "anthropics/skills", "path": "skills/pptx", "license": "Apache-2.0" },
+  "needs": { "web": false, "connections": [], "secrets": [] },
+  "targets": ["workflows", "pulsar"]
+}

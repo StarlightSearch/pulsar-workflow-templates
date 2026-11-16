@@ -1,0 +1,12 @@
+{
+  "slug": "reconciliation",
+  "title": "Bank reconciliation",
+  "category": "finance-data",
+  "summary": "Matches a bank statement against the ledger's cash account, explains every difference, and proposes the journal entries to fix them.",
+  "takes": "A bank statement and a ledger export",
+  "gives": "A reconciliation workbook and an exceptions list",
+  "icon": "table",
+  "source": { "name": "reconciliation", "repo": "anthropics/knowledge-work-plugins", "path": "finance/skills/reconciliation", "license": "Apache-2.0" },
+  "needs": { "web": false, "connections": [], "secrets": [] },
+  "targets": ["workflows", "pulsar"]
+}

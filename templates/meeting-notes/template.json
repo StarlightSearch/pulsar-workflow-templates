@@ -1,0 +1,12 @@
+{
+  "slug": "meeting-notes",
+  "title": "Meeting notes",
+  "category": "documents",
+  "summary": "Turns a meeting transcript into a Word document with the decisions, action items with owners and due dates, and open questions.",
+  "takes": "A meeting transcript",
+  "gives": "Notes as a Word document, actions as JSON",
+  "icon": "mic",
+  "source": { "name": "docx", "repo": "anthropics/skills", "path": "skills/docx", "license": "Apache-2.0" },
+  "needs": { "web": false, "connections": [], "secrets": [] },
+  "targets": ["workflows", "pulsar"]
+}

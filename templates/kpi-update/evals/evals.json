@@ -1,0 +1,14 @@
+{
+  "evals": [
+    {
+      "prompt": "Write this week's KPI update from the attached metrics.",
+      "files": ["samples/metrics.csv"],
+      "expectations": [
+        "update.md headline names the fall in signups (about 26%) in the week of 09/11/2026",
+        "update.md says visitors were roughly flat, so the drop is in signup conversion rather than traffic",
+        "update.md describes refunds falling back after the one-off spike in the week of 02/11/2026 as a return to normal, not as an improvement",
+        "/workspace/out/chart.png and /workspace/out/workbook.xlsx exist, and the workbook's Summary sheet shows signups 467 against 635"
+      ]
+    }
+  ]
+}

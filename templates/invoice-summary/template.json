@@ -1,0 +1,12 @@
+{
+  "slug": "invoice-summary",
+  "title": "Invoice summary",
+  "category": "documents",
+  "summary": "Reads an invoice PDF, pulls out the supplier, total and due date, checks the sums, and writes a one-page summary.",
+  "takes": "One invoice PDF",
+  "gives": "Key fields as JSON, checked sums, a summary PDF",
+  "icon": "doc",
+  "source": { "name": "pdf", "repo": "anthropics/skills", "path": "skills/pdf", "license": "Apache-2.0" },
+  "needs": { "web": false, "connections": [], "secrets": [] },
+  "targets": ["workflows", "pulsar"]
+}

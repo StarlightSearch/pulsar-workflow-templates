@@ -1,0 +1,14 @@
+{
+  "evals": [
+    {
+      "prompt": "Reconcile October's bank statement against the ledger.",
+      "files": ["samples/statement.csv", "samples/ledger.xlsx"],
+      "expectations": [
+        "output.json matched_count is 16, difference is 0 and reconciled is true",
+        "exceptions.md lists the 1,240.00 payment to Halden Print Works (30/10/2026) as an outstanding payment, a timing difference",
+        "exceptions.md identifies the Quarry Lane Cafe receipt recorded as 3,540.00 in the ledger against 3,450.00 at the bank, a 90.00 recording error, with a proposed correcting entry",
+        "exceptions.md lists the 18.50 bank fee as missing from the ledger, with a proposed entry debiting bank charges and crediting cash at bank"
+      ]
+    }
+  ]
+}

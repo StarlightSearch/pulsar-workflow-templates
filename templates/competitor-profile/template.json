@@ -1,0 +1,12 @@
+{
+  "slug": "competitor-profile",
+  "title": "Competitor profile",
+  "category": "marketing",
+  "summary": "Profiles two to five competitors from their websites: positioning, product, pricing and proof, compared side by side in one dated, sourced document.",
+  "takes": "Two to five competitor website URLs",
+  "gives": "A dated, sourced profile with a comparison",
+  "icon": "search",
+  "source": { "name": "competitor-profiling", "repo": "coreyhaines31/marketingskills", "path": "skills/competitor-profiling", "license": "MIT" },
+  "needs": { "web": true, "connections": [], "secrets": [] },
+  "targets": ["workflows", "pulsar"]
+}

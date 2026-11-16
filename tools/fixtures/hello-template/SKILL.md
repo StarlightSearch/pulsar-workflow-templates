@@ -7,7 +7,7 @@ description: Reads one text file and writes a one-line greeting summary of it.
 
 ## Inputs
 
-- **Text file**: the file to summarise, found in `/workspace/inputs/`.
+- **Text file**: the file to summarise, attached to the run.
 
 ## Steps
 

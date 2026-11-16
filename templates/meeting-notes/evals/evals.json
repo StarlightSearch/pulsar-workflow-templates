@@ -1,0 +1,23 @@
+{
+  "evals": [
+    {
+      "prompt": "Write up the notes from this meeting transcript.",
+      "files": ["samples/transcript.txt"],
+      "expectations": [
+        "output.json decisions include moving the launch to 1 February 2027 and dropping orange for launch",
+        "output.json actions include Tomas Reyes getting written confirmation from the supplier, due 2026-11-13",
+        "output.json actions include updating the website launch countdown with owner null",
+        "Free shipping is not listed as an action item, and the free beanie offer appears under open questions or parked, not as a decision"
+      ]
+    },
+    {
+      "prompt": "Notes from this morning's stand-up, please.",
+      "files": ["samples/standup.txt"],
+      "expectations": [
+        "output.json date is null because the transcript gives no date",
+        "output.json actions include Ana Sousa reviewing Leo Brandt's fix and Priya Nandakumar cleaning up the staging database",
+        "output.json open_questions include whether to test the onboarding checklist with the pilot customers or everyone"
+      ]
+    }
+  ]
+}

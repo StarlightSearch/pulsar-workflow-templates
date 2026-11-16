@@ -1,0 +1,33 @@
+{
+  "evals": [
+    {
+      "prompt": "From: Marta Kowalczyk (marta@quarrylanestudio.example)\nSubject: Charged twice this month??\n\nHi, I've just checked our business account and Tallyhop has taken GBP 48.00 twice on 3 November 2026, both payments show as completed, card ending 4417. We're on the Team plan and nobody changed anything. Can you refund the extra one please?\n\nAlso, our accountant needs a proper invoice with our company name and VAT number on it for these payments. Where do I get that?\n\nThanks, Marta (workspace owner, Quarry Lane Studio)",
+      "files": [
+        "samples/help/duplicate-charges.md",
+        "samples/help/invoices-and-receipts.md",
+        "samples/help/timesheet-export.md",
+        "samples/help/changing-plans.md"
+      ],
+      "expectations": [
+        "output.json category is billing and route_to is billing",
+        "reply.md says the duplicate GBP 48.00 charge has been passed to the billing team and that a refund reaches the card within 5 to 7 business days once issued, without saying the refund has already been made",
+        "reply.md tells the customer to add the company name and VAT number under Settings > Billing > Billing details and to download the invoice from Settings > Billing > Invoices",
+        "output.json sources include duplicate-charges.md and invoices-and-receipts.md and do not include timesheet-export.md"
+      ]
+    },
+    {
+      "prompt": "From: Tom Achebe (tom@northgate-joinery.example)\nSubject: Xero?\n\nHello, does Tallyhop integrate with Xero? We'd like our invoices to go across automatically instead of re-typing them every Friday.\n\nTom",
+      "files": [
+        "samples/help/duplicate-charges.md",
+        "samples/help/invoices-and-receipts.md",
+        "samples/help/timesheet-export.md",
+        "samples/help/changing-plans.md"
+      ],
+      "expectations": [
+        "output.json answered_from_articles is \"no\" with an empty sources list, or \"partly\" with no claim anywhere that Tallyhop supports Xero",
+        "reply.md neither claims nor denies that Tallyhop integrates with Xero; it says the team will check and get back to Tom",
+        "output.json route_to is tier-2 or product"
+      ]
+    }
+  ]
+}

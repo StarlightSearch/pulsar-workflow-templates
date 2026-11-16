@@ -1,0 +1,23 @@
+{
+  "evals": [
+    {
+      "prompt": "Summarise the attached invoice.",
+      "files": ["samples/invoice.pdf"],
+      "expectations": [
+        "output.json supplier is Halden Print Works Ltd and invoice_number is HPW-2026-0417",
+        "output.json total is 1576.80 and currency is EUR",
+        "output.json due_date is 2026-11-27 and checks_passed is true",
+        "/workspace/out/summary.pdf exists and lists the four line items"
+      ]
+    },
+    {
+      "prompt": "Summarise this catering invoice. It only prints payment terms, no due date.",
+      "files": ["samples/invoice-no-due-date.pdf"],
+      "expectations": [
+        "output.json total is 612.36 and currency is USD",
+        "output.json due_date is 2026-11-17 (invoice date 3 Nov 2026, i.e. 2026-11-03, plus Net 14)",
+        "The answer's Assumptions section says the due date was worked out from the payment terms"
+      ]
+    }
+  ]
+}

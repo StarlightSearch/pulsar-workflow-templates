@@ -1,8 +1,8 @@
 import { mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { fixture, REPO } from "./test-helpers";
-import { validateTemplate } from "./validate";
+import { fixture } from "./test-helpers";
+import { caseClashes, validateAll, validateTemplate } from "./validate";
 
 const read = (p: string) => readFileSync(p, "utf8");
 function editJson(file: string, fn: (j: any) => void) {
@@ -13,8 +13,9 @@ function editJson(file: string, fn: (j: any) => void) {
 const has = (errs: string[], re: RegExp) => errs.some((e) => re.test(e));
 
 describe("validateTemplate", () => {
-  it("accepts hello-template", () => {
-    expect(validateTemplate(join(REPO, "templates", "hello-template"))).toEqual([]);
+  it("accepts the hello-template fixture", () => {
+    const [, dir] = fixture();
+    expect(validateTemplate(dir)).toEqual([]);
   });
 
   it("rejects slug != folder", () => {
@@ -32,6 +33,19 @@ describe("validateTemplate", () => {
     const [, dir] = fixture();
     writeFileSync(join(dir, "SKILL.md"), "no frontmatter here\n");
     expect(has(validateTemplate(dir), /SKILL\.md/)).toBe(true);
+  });
+
+  it("rejects an output_schema Workflows' strict compile refuses (unquoted comma in a flow map)", () => {
+    const [, dir] = fixture();
+    const md = read(join(dir, "SKILL.md"));
+    const bad = md.replace(
+      "description: Reads one text file and writes a one-line greeting summary of it.\n",
+      "description: Reads one text file and writes a one-line greeting summary of it.\noutput_schema:\n  type: object\n  properties:\n    currency: { type: string, description: ISO code such as EUR, USD or GBP }\n",
+    );
+    writeFileSync(join(dir, "SKILL.md"), bad);
+    expect(has(validateTemplate(dir), /strict JSON Schema/)).toBe(true);
+    writeFileSync(join(dir, "SKILL.md"), bad.replace("description: ISO code such as EUR, USD or GBP", 'description: "ISO code such as EUR, USD or GBP"'));
+    expect(validateTemplate(dir)).toEqual([]);
   });
 
   it("rejects missing name or description", () => {
@@ -148,5 +162,41 @@ describe("validateTemplate", () => {
     const errs = validateTemplate(dir);
     expect(has(errs, /references\/x\.md: \/workspace\/tmp\/a\.txt/)).toBe(true);
     expect(has(errs, /references\/x\.md: .*fenced/)).toBe(true);
+  });
+
+  it("rejects unsafe file names and case-only duplicates", () => {
+    const [, dir] = fixture();
+    writeFileSync(join(dir, "my file.txt"), "x");
+    expect(has(validateTemplate(dir), /my file\.txt.*letters, digits/)).toBe(true);
+    expect(caseClashes(["samples/A.txt", "samples/a.txt", "b.txt"])).toHaveLength(1);
+    expect(caseClashes(["a.txt", "b.txt"])).toEqual([]);
+    const [, d3] = fixture();
+    writeFileSync(join(d3, "evals/evals.json"), JSON.stringify({ evals: [{ prompt: "p", files: ["a b.txt"], expectations: [] }] }));
+    expect(has(validateTemplate(d3), /letters, digits/)).toBe(true);
+  });
+
+  it("rejects /workspace/inputs in scripts and inline code spans", () => {
+    const [, dir] = fixture();
+    mkdirSync(join(dir, "scripts"), { recursive: true });
+    writeFileSync(join(dir, "scripts/x.py"), 'open("/workspace/inputs/a.txt")\n');
+    expect(has(validateTemplate(dir), /scripts\/x\.py.*\/workspace\/inputs.*prose/)).toBe(true);
+    const [, d2] = fixture();
+    const md = read(join(d2, "SKILL.md"));
+    writeFileSync(join(d2, "SKILL.md"), md + "\nRead `/workspace/inputs/a.txt` first.\n");
+    expect(has(validateTemplate(d2), /inline code span.*prose/)).toBe(true);
+  });
+
+  it("requires fetch_site.py copies to be identical", () => {
+    const [root, dir] = fixture("one");
+    const mk = (d: string, body: string) => {
+      mkdirSync(join(d, "scripts"), { recursive: true });
+      writeFileSync(join(d, "scripts/fetch_site.py"), body);
+    };
+    mk(dir, "a\n");
+    const two = join(root, "templates", "two");
+    mkdirSync(two, { recursive: true });
+    mk(two, "b\n");
+    const out = validateAll(root).find((r) => r.slug === "two")!;
+    expect(has(out.errors, /fetch_site\.py differs/)).toBe(true);
   });
 });

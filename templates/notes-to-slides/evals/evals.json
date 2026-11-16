@@ -1,0 +1,14 @@
+{
+  "evals": [
+    {
+      "prompt": "Turn these notes into a deck for Thursday's leadership meeting.",
+      "files": ["samples/notes.md"],
+      "expectations": [
+        "/workspace/out/deck.pptx exists, opens with python-pptx and has between 6 and 10 slides, each with speaker notes",
+        "The deck has a slide with the pilot's headline numbers (3.1 hours from 14.2, 41 from 184, 89% from 82%) and a native chart of the weekly first response times",
+        "The customer quote about the broken teapot appears word for word",
+        "The last slide asks to make the rota permanent from 1 December and approve about 27,600 euros a year"
+      ]
+    }
+  ]
+}

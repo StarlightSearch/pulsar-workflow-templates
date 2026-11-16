@@ -1,0 +1,22 @@
+{
+  "evals": [
+    {
+      "prompt": "Profile these competitors: https://plausible.io, https://usefathom.com and https://www.simpleanalytics.com. We make a privacy-first web analytics tool for small online shops.",
+      "files": [],
+      "expectations": [
+        "profile.md shows the date it was generated and has one section each for Plausible, Fathom and Simple Analytics, each with At a glance, Positioning and messaging, Pricing, and Strengths and weaknesses",
+        "profile.md opens with a comparison table that has a column for each of the three competitors",
+        "Every price in profile.md is followed by the URL of the page it came from, and any competitor whose prices were not found says pricing was not observed rather than giving a figure",
+        "output.json has three competitors, each with status ok, a url and at least two pages_read, and generated_on is an ISO date"
+      ]
+    },
+    {
+      "prompt": "Profile https://usefathom.com and https://rival-analytics-sample.example for us.",
+      "files": [],
+      "expectations": [
+        "profile.md profiles Fathom and states that rival-analytics-sample.example could not be fetched, with no invented facts about it",
+        "output.json lists rival-analytics-sample.example with status fetch_failed and an empty pages_read, and Fathom with status ok"
+      ]
+    }
+  ]
+}

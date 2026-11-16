@@ -1,0 +1,12 @@
+{
+  "slug": "contract-review",
+  "title": "Contract review",
+  "category": "legal",
+  "summary": "Reviews a contract against your checklist (or a sensible default), rates each clause red, yellow or green, and proposes redlines.",
+  "takes": "A contract PDF or Word file, plus your checklist",
+  "gives": "An issues report in Word with clause references",
+  "icon": "scale",
+  "source": { "name": "review-contract", "repo": "anthropics/knowledge-work-plugins", "path": "legal/skills/review-contract", "license": "Apache-2.0" },
+  "needs": { "web": false, "connections": [], "secrets": [] },
+  "targets": ["workflows", "pulsar"]
+}

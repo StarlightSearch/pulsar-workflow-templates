@@ -9,8 +9,14 @@ export const LICENSES = ["Apache-2.0", "MIT", "BSD-2-Clause", "BSD-3-Clause", "C
 const TEXT_EXT = /\.(md|txt|json|py|js|ts|csv|tsv|ya?ml|html|css|svg|xml)$/i;
 const PREFIXES = ["/workspace/workflow/", "/workspace/inputs/", "/workspace/out/", "/workspace/knowledge/"];
 
+/** Same rule as packages/core/src/templates/fetch.ts in Pulsar. */
+const SAFE_SEGMENT = /^[A-Za-z0-9._-]+$/;
+
 const schema = JSON.parse(readFileSync(resolve(import.meta.dirname, "schema/template.schema.json"), "utf8"));
 const checkSchema = new Ajv({ allErrors: true }).compile(schema);
+// Pulsar Workflows compiles output_schema in Ajv strict mode and refuses a run on an unknown keyword.
+// An unquoted description with a comma inside a YAML flow map ({ description: a, b }) splits into one.
+const strictAjv = new Ajv({ strict: true, logger: false });
 
 interface Entry {
   rel: string;
@@ -19,6 +25,7 @@ interface Entry {
 
 /** Every regular file under `dir` (relative, "/" separated), plus the problems met on the way. */
 function walk(dir: string, errors: string[], rel = ""): Entry[] {
+
   const out: Entry[] = [];
   for (const name of readdirSync(join(dir, rel)).sort()) {
     const r = rel ? `${rel}/${name}` : name;
@@ -26,10 +33,26 @@ function walk(dir: string, errors: string[], rel = ""): Entry[] {
       errors.push(`${r}: dotfiles are not allowed`);
       continue;
     }
+    if (!SAFE_SEGMENT.test(name)) {
+      errors.push(`${r}: file names may only use letters, digits, ".", "_" and "-"`);
+      continue;
+    }
     const st = lstatSync(join(dir, r));
     if (st.isSymbolicLink()) errors.push(`${r}: symlinks are not allowed`);
     else if (st.isDirectory()) out.push(...walk(dir, errors, r));
     else if (st.isFile()) out.push({ rel: r, size: st.size });
+  }
+  return out;
+}
+
+/** Paths that differ from an earlier one only in letter case (a checkout on a case-insensitive disk would merge them). */
+export function caseClashes(paths: string[]): string[] {
+  const seen = new Map<string, string>();
+  const out: string[] = [];
+  for (const p of paths) {
+    const prior = seen.get(p.toLowerCase());
+    if (prior !== undefined && prior !== p) out.push(`${p}: differs from ${prior} only in letter case`);
+    else seen.set(p.toLowerCase(), p);
   }
   return out;
 }
@@ -41,8 +64,11 @@ function badRelPath(p: string): string | null {
   const parts = p.split("/");
   if (parts.includes("..")) return "must not contain ..";
   if (parts.some((s) => s.startsWith("."))) return "must not contain a dotfile segment";
+  if (parts.some((s) => !SAFE_SEGMENT.test(s))) return "may only use letters, digits, \".\", \"_\" and \"-\" in each segment";
   return null;
 }
+
+const INPUTS_HINT = "inputs are referred to in prose (the files attached to this run) and passed to scripts as arguments";
 
 const sameSet = (a: string[], b: string[]) => a.length === b.length && [...a].sort().every((v, i) => v === [...b].sort()[i]);
 
@@ -54,6 +80,7 @@ export function validateTemplate(dir: string): string[] {
 
   const entries = walk(dir, errors);
   const has = new Set(entries.map((e) => e.rel));
+  errors.push(...caseClashes(entries.map((e) => e.rel)));
   if (entries.length > LIMITS.files) errors.push(`${entries.length} files, at most ${LIMITS.files} are allowed`);
   for (const e of entries) if (e.size > LIMITS.fileBytes) errors.push(`${e.rel}: ${e.size} bytes exceeds 1 MB`);
   const total = entries.reduce((n, e) => n + e.size, 0);
@@ -90,6 +117,13 @@ export function validateTemplate(dir: string): string[] {
     const md = readFileSync(join(dir, "SKILL.md"), "utf8");
     const meta = parseWorkflowMeta(md);
     for (const e of meta.errors) errors.push(`SKILL.md: ${e}`);
+    if (meta.outputSchema) {
+      try {
+        strictAjv.compile(meta.outputSchema);
+      } catch (e) {
+        errors.push(`SKILL.md: output_schema is not a valid strict JSON Schema (${(e as Error).message}); quote descriptions that contain a comma`);
+      }
+    }
     if (md.includes("—")) errors.push("SKILL.md contains an em-dash");
     if (tpl?.needs) {
       if (Array.isArray(tpl.needs.secrets) && !sameSet(tpl.needs.secrets, meta.secrets ?? []))
@@ -100,6 +134,8 @@ export function validateTemplate(dir: string): string[] {
     checkWorkspacePaths(md, has, errors, "SKILL.md");
   }
   for (const rel of has) {
+    if (TEXT_EXT.test(rel) && !rel.endsWith(".md") && readFileSync(join(dir, rel), "utf8").includes("/workspace/inputs"))
+      errors.push(`${rel}: /workspace/inputs must not appear in a script or data file; ${INPUTS_HINT}`);
     if (rel.startsWith("references/") && rel.endsWith(".md")) checkWorkspacePaths(readFileSync(join(dir, rel), "utf8"), has, errors, rel);
     if (TEXT_EXT.test(rel) && readFileSync(join(dir, rel), "utf8").includes("\u2014")) errors.push(`${rel} contains an em-dash`);
   }
@@ -138,6 +174,13 @@ function checkWorkspacePaths(md: string, has: Set<string>, errors: string[], lab
       fenced = !fenced;
       continue;
     }
+    if (!fenced) {
+      for (const span of line.matchAll(/`([^`]*)`/g))
+        if (span[1].includes("/workspace/inputs") && !seen.has("span")) {
+          seen.add("span");
+          errors.push(`${label}: /workspace/inputs must not appear in an inline code span; ${INPUTS_HINT}`);
+        }
+    }
     for (const m of line.matchAll(/\/workspace(?:\/[A-Za-z0-9_.\-/]*)?/g)) {
       const p = m[0].replace(/[.,;:)]+$/, "");
       const prefix = PREFIXES.find((x) => p.startsWith(x) || p + "/" === x);
@@ -164,7 +207,16 @@ function checkWorkspacePaths(md: string, has: Set<string>, errors: string[], lab
 export function validateAll(root: string): { slug: string; errors: string[] }[] {
   const tdir = join(root, "templates");
   const slugs = existsSync(tdir) ? readdirSync(tdir).filter((n) => lstatSync(join(tdir, n)).isDirectory()).sort() : [];
-  return slugs.map((slug) => ({ slug, errors: validateTemplate(join(tdir, slug)) }));
+  const results = slugs.map((slug) => ({ slug, errors: validateTemplate(join(tdir, slug)) }));
+  // Copies of fetch_site.py must stay byte-identical across templates.
+  const copies = slugs.filter((s) => existsSync(join(tdir, s, "scripts/fetch_site.py")));
+  if (copies.length > 1) {
+    const ref = readFileSync(join(tdir, copies[0], "scripts/fetch_site.py"));
+    for (const s of copies.slice(1))
+      if (!ref.equals(readFileSync(join(tdir, s, "scripts/fetch_site.py"))))
+        results.find((r) => r.slug === s)!.errors.push(`scripts/fetch_site.py differs from the copy in ${copies[0]}`);
+  }
+  return results;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

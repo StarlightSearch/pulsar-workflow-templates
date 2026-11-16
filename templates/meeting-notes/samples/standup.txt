@@ -1,0 +1,14 @@
+[Sample transcript: invented for the Pulsar workflow template gallery. The people and the product are fictional.]
+
+00:00:04 Priya Nandakumar: Morning. Quick one today. Leo, how is the export bug?
+00:00:11 Leo Brandt: Fixed on my branch. The CSV export was dropping rows with a comma in the name. I'll merge it tomorrow after review.
+00:00:25 Priya Nandakumar: Who reviews?
+00:00:28 Ana Sousa: I can, this afternoon.
+00:00:33 Priya Nandakumar: Great. Then we ship the fix in Thursday's release. Agreed?
+00:00:38 Leo Brandt: Agreed.
+00:00:39 Ana Sousa: Yes.
+00:00:45 Ana Sousa: On my side, the new onboarding checklist is ready for testing. Do we test it with the five pilot customers or with everyone?
+00:00:55 Priya Nandakumar: I don't know yet. Let me check with sales and come back to you.
+00:01:04 Leo Brandt: Also, the staging database is almost full. Somebody should clean it up before Friday.
+00:01:10 Priya Nandakumar: I'll do it Wednesday.
+00:01:14 Priya Nandakumar: That's it, thanks both.

@@ -1,0 +1,23 @@
+{
+  "evals": [
+    {
+      "prompt": "Research https://basecamp.com as a prospect. We sell Northlight, an onboarding platform that gets new hires productive in their first 30 days, for companies of 50 to 500 people. Proof point: customers cut time to first shipped work by a third.",
+      "files": [],
+      "expectations": [
+        "brief.md names Basecamp and has Snapshot, Signals, Fit, Hooks and Not verified sections",
+        "brief.md gives 2 or 3 hooks, each tied to a page URL on the company's own site (basecamp.com, or the parent company's page that a basecamp.com address redirects to, such as its jobs page)",
+        "email.md starts with a Subject line, its body is 150 words or fewer, names Basecamp, contains no em-dash and ends with a single question as the ask",
+        "output.json status is ok, fit is one of strong, moderate, poor or unknown, and pages_read lists at least 2 basecamp.com URLs"
+      ]
+    },
+    {
+      "prompt": "Research https://northfield-prospect-sample.example as a prospect. We sell Northlight, an onboarding platform for companies of 50 to 500 people.",
+      "files": [],
+      "expectations": [
+        "output.json status is fetch_failed, hooks and pages_read are empty lists",
+        "The answer says the site could not be read and gives no invented facts about the company",
+        "No brief.md or email.md is written to /workspace/out/"
+      ]
+    }
+  ]
+}
