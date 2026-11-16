@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "commit": "c06287a5fb588ebd117b2e766feca8368f3caff9",
-  "builtAt": "2026-11-16T16:48:40.282Z",
+  "commit": "9362e8ea025995dd46c8101879aeb2e9c78ec3b0",
+  "builtAt": "2026-11-16T17:43:15.788Z",
   "categories": [
     {
       "id": "documents",
@@ -72,8 +72,8 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 6469,
-          "sha256": "fc8f13341120865cba6f4e23eeb9c4bb611089b8a7bbc4a8b453e252173b07ee"
+          "size": 6489,
+          "sha256": "31b78a16a100d720de3f67564d12e10b10497e97734c20dc9033246553e938d4"
         },
         {
           "path": "evals/evals.json",
@@ -134,8 +134,8 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 6029,
-          "sha256": "2945b2fc38500af3034c164ffd6b20b053bb1738e14340eba5ca380df94db83b"
+          "size": 6041,
+          "sha256": "2454a992d2a45e69d2005ab6cffc152f020ab4dd236a19cfd724d57d35c5c988"
         },
         {
           "path": "evals/evals.json",
@@ -192,8 +192,8 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 8194,
-          "sha256": "089a728ca658196275dd1e9c7a24acd064f458ae171ddfb6025ae016116e27bd"
+          "size": 8208,
+          "sha256": "64582070ede33286a7a882e48db0fd0178c4928acdacb3edb1beebef68ce4aa4"
         },
         {
           "path": "evals/evals.json",
@@ -212,8 +212,8 @@
         },
         {
           "path": "scripts/reconcile.py",
-          "size": 22298,
-          "sha256": "0d5fa2c8ec3c1b2b79f8fee96869416ee03d3f8776f7018b9df4abc483866c22"
+          "size": 22300,
+          "sha256": "d128244f2074be20c86373a562a076dc36fea82940f5ef4ab5c25e7e89eb41b1"
         }
       ]
     },
@@ -250,8 +250,8 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 6744,
-          "sha256": "85b16e44e18c8a8f5c7984f1d148e15c7279f4bc233026a38506a4c0bc6be093"
+          "size": 7599,
+          "sha256": "309f0ae3480fb0bb43096be73a2d0a31222232ebeb0c3db05d3273f093574b53"
         },
         {
           "path": "evals/evals.json",
@@ -303,8 +303,8 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 9754,
-          "sha256": "99db4438238c5343d85a193d2821cafc995cbfe66e27cd4671095a24b6c74691"
+          "size": 9764,
+          "sha256": "8fd08c6f7e9f34bb2b61cd09c72966905586186d2780ff5378948468ef877bd0"
         },
         {
           "path": "evals/evals.json",
@@ -372,13 +372,13 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 8965,
-          "sha256": "8a5484787d3549fb545a2a78df5b441ef6b3322803c9f8f23192a99b6bb4c836"
+          "size": 10095,
+          "sha256": "5a295b27aabb7a56d1bfb36d607c5d214f555d09805f0c85f42920ce7e269f0f"
         },
         {
           "path": "evals/evals.json",
-          "size": 1293,
-          "sha256": "5e4a91f90dee1473c90bf025d5497997f36335afd58c9933be5c0ccfe1776c79"
+          "size": 1415,
+          "sha256": "0e9afb93a1c6a259fe3b6adf2d673be3f91f7587a3fb03a131c05a2be96a02d9"
         },
         {
           "path": "scripts/check_email.py",
@@ -426,8 +426,8 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 9451,
-          "sha256": "e624e4f01a4e14273b409f888d42476aa45c317bb905f3bd149189ea33e0ebff"
+          "size": 9673,
+          "sha256": "abf61970c221d5a88fa838f9de92255a2b92efaf680cad344f98e8a1706eebe8"
         },
         {
           "path": "evals/evals.json",
@@ -480,8 +480,8 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 8973,
-          "sha256": "53dbfc71c0a2b80838da76f5d1744e6a42957b532cc6236d98bbb25f950e7fb0"
+          "size": 9235,
+          "sha256": "f918f45f28d8f8c774745da5c5a652d5d4a8ed8ebb0fd0ec55003487ca9f9243"
         },
         {
           "path": "evals/evals.json",
@@ -534,8 +534,8 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 8962,
-          "sha256": "4f8ee6c47282961140b035e64b19420cf03e7d9eee7245c0c70ba372af4e04bd"
+          "size": 8970,
+          "sha256": "2401b2cb382679f76d8661f8d6d3305c5d6503b385d735df35b1d2ce38fa481a"
         },
         {
           "path": "evals/evals.json",
@@ -607,8 +607,8 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 6332,
-          "sha256": "d4ef8a750a9d77add9f9cff973dae0ab528c8eb01105dbc8a45436f98c06fa9f"
+          "size": 6420,
+          "sha256": "486175a3f8ec0d8266d7f9f27d27630beff590fcc445786c7b1558f28321eb45"
         },
         {
           "path": "evals/evals.json",
