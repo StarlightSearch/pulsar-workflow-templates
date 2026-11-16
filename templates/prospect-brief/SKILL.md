@@ -90,10 +90,10 @@ Write facts as the site states them ("says it serves 4,000 clinics"), not as you
 
 Write /workspace/out/email.md: `Subject: <subject>`, a blank line, then the body, using the strongest hook.
 
-- **Shape**: observation (the hook, in their words), the problem it usually brings, one line on how you help with one proof point from the input (never invent a number or a customer), one low-friction question as the ask ("Worth a look?", "Is this on your radar?"), then `[Your name]`.
+- **Shape**: observation (the hook, in their words), the problem it usually brings, one line on how you help with one proof point from the input (never invent a number or a customer), exactly one low-friction question as the ask, on its own as the last line ("Worth a look?", "Is this on your radar?"), then `[Your name]`.
 - **Voice**: a peer who noticed something, not a vendor: contractions, short sentences, "you" more than "we". Open with them, never with who you are.
 - **Limits**: 150 words or fewer, a subject of 2 to 6 plain words that looks internal (for example "second warehouse rollout"), no links, no em-dashes, no stock phrases ("I hope this finds you well", "leverage", "quick question").
-- Address the named contact if the input gives one, else `Hi <first name>,` with the role from step 4 noted under Assumptions.
+- **Layout**: first line `Hi Sam,` with the contact's real first name when the input names one, else just `Hi,` (never a guessed name; note the role to target, from step 4, under Assumptions). The one question is the last line before the sign-off, and `[Your name]` is the last line. The only placeholders allowed are `[Your name]` and, when you do not know what is sold, `[ONE LINE ON WHAT YOU OFFER]`.
 
 Then run `python3 /workspace/workflow/scripts/check_email.py /workspace/out/email.md "<Company>"` and fix every `PROBLEM` it prints until it says `ok`.
 

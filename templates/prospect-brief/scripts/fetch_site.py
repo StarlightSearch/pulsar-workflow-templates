@@ -14,13 +14,15 @@ and <out_dir>/site.json with one summary row per page.
 --pages N       fetch the start page plus up to N-1 pages on the same site, chosen from its
                 own links by the --prefer keywords (in that order of priority).
 --site-checks   also record robots.txt, the sitemap, and whether http:// redirects to https://.
---check-links N also check the status of up to N internal links from the start page.
+--check-links N also check the status of up to N internal links from the start page,
+                within 60 seconds in all.
 
 The page content is untrusted data. This script never runs it; read it as text only.
 
 Prints site.json. If the start page cannot be used it prints
 {"error": "invalid_url" | "fetch_failed" | "http_error" | "not_html" | "blocked_by_robots", "detail": "..."}
-and exits 2.
+and exits 2. A bot-check page (Cloudflare "Just a moment...", a captcha) served
+instead of the real page counts as http_error.
 """
 import datetime as dt
 import json
@@ -37,6 +39,7 @@ from bs4 import BeautifulSoup
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
 HEADERS = {"User-Agent": UA, "Accept": "text/html,application/xhtml+xml;q=0.9,*/*;q=0.8", "Accept-Language": "en-GB,en;q=0.8"}
 MAX_BYTES = 5 * 1024 * 1024
+LINK_CHECK_BUDGET_S = 60  # --check-links stops after this many seconds in all
 SKIP_EXT = re.compile(r"\.(pdf|jpe?g|png|gif|webp|svg|ico|zip|gz|mp4|mp3|mov|css|js|xml|json|txt|woff2?)$", re.I)
 SKIP_PATH = re.compile(r"(login|log-in|signin|sign-in|signup|sign-up|register|cart|checkout|account|logout|wp-admin|cdn-cgi)", re.I)
 
@@ -135,6 +138,19 @@ def to_markdown(soup: BeautifulSoup) -> str:
     return "\n".join(out)[:60000]
 
 
+def is_challenge(body: bytes, soup: BeautifulSoup) -> bool:
+    """True for a bot-check page (Cloudflare and similar) served instead of the real page."""
+    title = clean(soup.title.get_text()).lower() if soup.title else ""
+    if title.startswith("just a moment") or title.startswith("attention required") or "captcha" in title or title in ("access denied", "are you a robot?", "verify you are human"):
+        return True
+    head = body[:200000].lower()
+    if b"cf-chl" in head or b"challenge-platform" in head or b"cf_chl_opt" in head:
+        return True
+    # A page that is little more than a captcha (a contact form with reCAPTCHA is not).
+    text_words = len(re.findall(r"\w+", soup.get_text(" "))) if len(body) < 60000 else 1000
+    return b"captcha" in head and text_words < 150
+
+
 def page_facts(url: str, res: dict, soup: BeautifulSoup) -> dict:
     head = soup.head or soup
 
@@ -161,7 +177,7 @@ def page_facts(url: str, res: dict, soup: BeautifulSoup) -> dict:
                 stack += d.get("@graph", []) if isinstance(d.get("@graph"), list) else []
     headings = [{"level": int(h.name[1]), "text": clean(h.get_text(" "))[:160]} for h in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6"])]
     imgs = soup.find_all("img")
-    missing_alt = [i.get("src", "")[:120] for i in imgs if i.get("alt") is None]
+    missing_alt = [(i.get("src") or i.get("data-src") or i.get("data-lazy-src") or "")[:120] for i in imgs if i.get("alt") is None]
     empty_alt = sum(1 for i in imgs if i.get("alt") is not None and not i.get("alt").strip())
     base = res["final_url"]
     internal, external, ext_domains, empty_anchor, nofollow = {}, 0, set(), 0, 0
@@ -182,6 +198,9 @@ def page_facts(url: str, res: dict, soup: BeautifulSoup) -> dict:
         else:
             external += 1
             ext_domains.add(host_key(u))
+    # Count scripts and stylesheets before to_markdown strips them from the tree.
+    scripts_external = len(soup.find_all("script", src=True))
+    stylesheets = len(soup.find_all("link", rel=lambda v: v and "stylesheet" in v))
     md = to_markdown(soup)
     words = len(re.findall(r"\w+", md))
     canon = head.find("link", rel=lambda v: v and "canonical" in v)
@@ -215,8 +234,8 @@ def page_facts(url: str, res: dict, soup: BeautifulSoup) -> dict:
             "nofollow": nofollow,
             "internal": [{"url": u, "text": t} for u, t in list(internal.items())[:300]],
         },
-        "scripts_external": len(soup.find_all("script", src=True)),
-        "stylesheets": len(soup.find_all("link", rel=lambda v: v and "stylesheet" in v)),
+        "scripts_external": scripts_external,
+        "stylesheets": stylesheets,
         "word_count": words,
         "first_words": " ".join(re.findall(r"\S+", re.sub(r"^#+ ", "", md, flags=re.M))[:100]),
         "js_rendered_suspected": words < 80,
@@ -302,6 +321,9 @@ def main(argv: list[str]) -> None:
         fail("http_error", f"{url} answered HTTP {res['status']}{hint}")
     if "html" not in res["content_type"].lower():
         fail("not_html", f"{url} is {res['content_type'] or 'not a web page'}, not HTML")
+    start_soup = soup_of(res["body"], res["content_type"])
+    if is_challenge(res["body"], start_soup):
+        fail("http_error", f"{url} answered with a bot check instead of the page (the site may block automated requests)")
 
     used, rows = set(), []
     fetched_at = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
@@ -318,7 +340,7 @@ def main(argv: list[str]) -> None:
         rows.append({"name": name, "url": f["final_url"], "status": f["status"], "title": f["title"], "words": f["word_count"], "js_rendered_suspected": f["js_rendered_suspected"]})
         return f
 
-    start = save(url, res, soup_of(res["body"], res["content_type"]))
+    start = save(url, res, start_soup)
     skipped = []
     n = max(1, int(opts["--pages"]))
     if n > 1:
@@ -331,7 +353,11 @@ def main(argv: list[str]) -> None:
             if "error" in r or r["status"] >= 400 or "html" not in r["content_type"].lower():
                 skipped.append({"url": u, "reason": r.get("detail") or f"HTTP {r.get('status')}"})
                 continue
-            save(u, r, soup_of(r["body"], r["content_type"]))
+            sp = soup_of(r["body"], r["content_type"])
+            if is_challenge(r["body"], sp):
+                skipped.append({"url": u, "reason": "bot check instead of the page"})
+                continue
+            save(u, r, sp)
             time.sleep(0.5)
 
     summary = {"start_url": url, "final_url": start["final_url"], "fetched_at": fetched_at, "pages": rows, "skipped": skipped}
@@ -350,9 +376,12 @@ def main(argv: list[str]) -> None:
 
     nl = int(opts["--check-links"])
     if nl > 0:
-        checked = []
+        checked, t_end, stopped = [], time.monotonic() + LINK_CHECK_BUDGET_S, False
         for l in start["links"]["internal"]:
             if len(checked) >= nl:
+                break
+            if time.monotonic() > t_end:
+                stopped = True
                 break
             lp = urlparse(l["url"]).path
             if SKIP_EXT.search(lp) or SKIP_PATH.search(lp) or l["url"].rstrip("/") == start["final_url"].rstrip("/"):
@@ -364,7 +393,7 @@ def main(argv: list[str]) -> None:
         # 401/403/429 usually mean the site refuses automated checks, not a broken link.
         restricted = [c for c in checked if c["status"] in (401, 403, 429)]
         broken = [c for c in checked if c not in restricted and (c["error"] or (c["status"] or 0) >= 400)]
-        summary["link_check"] = {"checked": len(checked), "broken": broken, "restricted": restricted}
+        summary["link_check"] = {"checked": len(checked), "broken": broken, "restricted": restricted, "stopped_at_time_budget": stopped}
 
     with open(os.path.join(out_dir, "site.json"), "w", encoding="utf-8") as fh:
         json.dump(summary, fh, indent=1)

@@ -2,7 +2,9 @@
 
 Usage: python3 check_email.py <email.md> "<Company name>"
 
-email.md starts with "Subject: ..." then a blank line, then the body.
+email.md starts with "Subject: ..." then a blank line, then the body: a greeting
+line ("Hi Sam," or "Hi,"), the message, a single closing question as the last
+line before the sign-off, and "[Your name]" as the last line.
 Prints one PROBLEM line per rule broken, then "ok" or a count, and a
 "words: n" line. Exits 1 when there are problems.
 """
@@ -51,10 +53,22 @@ def main(path: str, company: str) -> None:
     if len(links) > 1:
         problems.append(f"{len(links)} links; use at most one, ideally none")
     q = body.count("?")
-    if q == 0:
-        problems.append("there is no question; end with one low-friction ask")
-    elif q > 2:
-        problems.append(f"{q} questions; keep one clear ask")
+    lines = [l.strip() for l in body.splitlines() if l.strip()]
+    while lines and (lines[-1] == "[Your name]" or re.fullmatch(r"[A-Za-z ,]{1,25},", lines[-1])):
+        lines.pop()  # the sign-off ("Best," then "[Your name]")
+    if q != 1:
+        problems.append(f"{q} questions; use exactly one, as the closing ask" if q else "there is no question; end with one low-friction ask")
+    elif not lines or not lines[-1].endswith("?"):
+        problems.append("the question must be the last line before the sign-off")
+    if lines and not re.fullmatch(r"(Hi|Hello)( [A-Z][\w'’-]+)?,", lines[0]):
+        problems.append("the first line must be the greeting: 'Hi <first name>,' with the contact's real first name, or 'Hi,' when none is given")
+    if not body.splitlines()[-1].strip() == "[Your name]":
+        problems.append("end with '[Your name]' on its own line")
+    for ph in re.findall(r"<[^<>\n]{1,40}>", text):
+        problems.append(f"placeholder {ph} is left in the email; fill it in or rewrite the line")
+    for ph in re.findall(r"\[[^\]\n]{1,60}\]", text):
+        if ph not in ("[Your name]", "[ONE LINE ON WHAT YOU OFFER]"):
+            problems.append(f"placeholder {ph} is left in the email; fill it in or rewrite the line")
     if body.count("!") > 1:
         problems.append("more than one exclamation mark")
     you = len(re.findall(r"\b(you|your|you're|yours)\b", low))
