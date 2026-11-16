@@ -1,0 +1,9 @@
+[
+  { "id": "documents", "title": "Documents", "order": 1 },
+  { "id": "finance-data", "title": "Finance & data", "order": 2 },
+  { "id": "legal", "title": "Legal", "order": 3 },
+  { "id": "sales", "title": "Sales", "order": 4 },
+  { "id": "marketing", "title": "Marketing", "order": 5 },
+  { "id": "support", "title": "Support", "order": 6 },
+  { "id": "presentations", "title": "Presentations", "order": 7 }
+]

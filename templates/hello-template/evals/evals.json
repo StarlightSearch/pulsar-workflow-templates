@@ -1,0 +1,9 @@
+{
+  "evals": [
+    {
+      "prompt": "Summarise the attached text file.",
+      "files": ["samples/hello.txt"],
+      "expectations": ["Writes /workspace/out/summary.txt", "The summary is one sentence"]
+    }
+  ]
+}
