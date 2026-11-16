@@ -10,3 +10,4 @@ This product includes templates adapted from the sources below. One line per ada
 - templates/reconciliation: adapted from anthropics/knowledge-work-plugins, finance/skills/reconciliation (https://github.com/anthropics/knowledge-work-plugins/tree/main/finance/skills/reconciliation), Apache-2.0.
 - templates/notes-to-slides: adapted from anthropics/skills, skills/pptx (https://github.com/anthropics/skills/tree/main/skills/pptx), Apache-2.0.
 - templates/contract-review: adapted from anthropics/knowledge-work-plugins, legal/skills/review-contract (https://github.com/anthropics/knowledge-work-plugins/tree/main/legal/skills/review-contract), Apache-2.0.
+- templates/ticket-reply: adapted from anthropics/knowledge-work-plugins, customer-support/skills/ticket-triage and customer-support/skills/draft-response (https://github.com/anthropics/knowledge-work-plugins/tree/main/customer-support), Apache-2.0.

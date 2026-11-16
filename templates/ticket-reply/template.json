@@ -1,0 +1,12 @@
+{
+  "slug": "ticket-reply",
+  "title": "Ticket reply",
+  "category": "support",
+  "summary": "Triages a support ticket (category, priority, team) and drafts a reply grounded only in your help articles, citing what it used.",
+  "takes": "A customer ticket and your help articles",
+  "gives": "Triage as JSON and a reply draft",
+  "icon": "mail",
+  "source": { "name": "customer-support", "repo": "anthropics/knowledge-work-plugins", "path": "customer-support/skills", "license": "Apache-2.0" },
+  "needs": { "web": false, "connections": [], "secrets": [] },
+  "targets": ["workflows", "pulsar"]
+}
