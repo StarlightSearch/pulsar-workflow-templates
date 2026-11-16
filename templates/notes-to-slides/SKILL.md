@@ -38,6 +38,8 @@ Take the notes path from /workspace/inputs/ (for a .docx, read the paragraphs wi
 
 Write /tmp/deck.json, choosing for each slide the layout that shows its content best.
 
+It is a working file: keep it in /tmp, since only deck.pptx belongs in /workspace/out.
+
 ```json
 {
   "title": "Deck title", "author": "Presenter", "palette": "ocean", "footer": "Short footer text",
