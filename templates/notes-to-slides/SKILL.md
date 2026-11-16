@@ -17,11 +17,11 @@ Takes the notes someone wrote before a meeting and returns a deck they could pre
 
 ## Steps
 
-### 1. Install the slide library
+### 1. Check the slide library
 
-Install python-pptx, which the run sandbox does not include.
+Make sure python-pptx can be imported, installing it only if it is missing.
 
-Run `pip install --quiet python-pptx`. If that fails, try `pip install --quiet --user python-pptx`. If it still fails (no network), there is no way to write a .pptx here: say so in the answer and stop, rather than writing a different format.
+Run `python3 -c "import pptx"`. If that works, go on (some sandboxes ship it). If it fails, run `pip install --quiet --user --break-system-packages python-pptx` (the system Python refuses a plain `pip install`, so the flag is needed) and check the import again. If it still fails (for example no network), there is no way to write a .pptx here: say so in the answer and stop, rather than writing a different format.
 
 ### 2. Plan the storyline
 
@@ -32,7 +32,7 @@ Take the notes path from /workspace/inputs/ (for a .docx, read the paragraphs wi
 - **Purpose**: a decision, an update, a pitch. If the notes end with an ask, the deck builds toward it. Without a brief, assume a live talk to people who know the topic, about 1.5 minutes a slide.
 - **Size**: 6 to 10 slides for most notes; fewer for a short talk. Do not pad and do not drop content the notes treat as important.
 - **Order**: the main message first (the title slide says it), then the reasons and evidence, then what happens next. Keep the order of the notes where it already works.
-- **Titles**: each content title is the point of the slide as a short sentence ("Replies got faster within three weeks and stayed fast"), not a topic label ("Results"). No full stop at the end, under about 60 characters.
+- **Titles**: each content title is the point of the slide as a short sentence ("Late deliveries halved after we moved the cut-off to 3pm"), not a topic label ("Results"). No full stop at the end, under about 60 characters.
 
 ### 3. Write the slide plan
 
@@ -40,14 +40,14 @@ Write /tmp/deck.json, choosing for each slide the layout that shows its content 
 
 ```json
 {
-  "title": "Deck title", "author": "Presenter", "palette": "forest", "footer": "Short footer text",
+  "title": "Deck title", "author": "Presenter", "palette": "ocean", "footer": "Short footer text",
   "slides": [
     {"kind": "title", "title": "The main message", "subtitle": "What this is", "byline": "Name, role", "notes": "..."},
     {"kind": "bullets", "title": "...", "bullets": ["3 to 5 short lines"], "takeaway": "Optional one-line point shown in a side panel", "notes": "..."},
-    {"kind": "stats", "title": "...", "stats": [{"value": "3.1 h", "label": "Median first response", "detail": "from 14.2 hours"}], "note": "Source or basis", "notes": "..."},
-    {"kind": "chart", "title": "...", "chart": {"type": "line", "categories": ["Wk 1", "Wk 2"], "series": [{"name": "Before", "values": [13.8, 14.5]}], "value_title": "Hours"}, "caption": "What to see in it", "notes": "..."},
+    {"kind": "stats", "title": "...", "stats": [{"value": "4.2%", "label": "Late deliveries", "detail": "from 8.9%"}], "note": "Source or basis", "notes": "..."},
+    {"kind": "chart", "title": "...", "chart": {"type": "line", "categories": ["Jan", "Feb"], "series": [{"name": "Late %", "values": [8.9, 6.1]}], "value_title": "Percent late"}, "caption": "What to see in it", "notes": "..."},
     {"kind": "compare", "title": "...", "left": {"heading": "Before", "bullets": ["..."]}, "right": {"heading": "After", "bullets": ["..."]}, "notes": "..."},
-    {"kind": "timeline", "title": "...", "steps": [{"label": "December", "text": "What happens"}], "notes": "..."},
+    {"kind": "timeline", "title": "...", "steps": [{"label": "April", "text": "What happens"}], "notes": "..."},
     {"kind": "statement", "title": "Small heading", "text": "A quote or one big sentence", "attribution": "Who said it", "notes": "..."},
     {"kind": "closing", "title": "The ask or the next steps", "bullets": ["Up to 4 items"], "notes": "..."}
   ]

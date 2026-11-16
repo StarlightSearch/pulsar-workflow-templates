@@ -4,7 +4,7 @@ Usage:
   python3 build_deck.py <deck.json> <out.pptx>      build the deck, print fit warnings
   python3 build_deck.py --text <deck.pptx>          print every slide's text and notes (for checking)
 
-Needs python-pptx (pip install python-pptx). The design lives here so every
+Needs python-pptx (on a Debian system Python: pip install --user --break-system-packages python-pptx). The design lives here so every
 deck is consistent: one palette, dark title and closing slides, light content
 slides, a serif heading font with a sans body font, real titles (they show in
 PowerPoint's outline and to screen readers), speaker notes in the notes pane,
