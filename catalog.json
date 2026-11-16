@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "commit": "4c15d68f15c11f9170d2d3bb5b5379190f2b4913",
+  "builtAt": "2026-11-16T15:12:12.721Z",
+  "categories": [
+    {
+      "id": "documents",
+      "title": "Documents",
+      "order": 1
+    },
+    {
+      "id": "finance-data",
+      "title": "Finance & data",
+      "order": 2
+    },
+    {
+      "id": "legal",
+      "title": "Legal",
+      "order": 3
+    },
+    {
+      "id": "sales",
+      "title": "Sales",
+      "order": 4
+    },
+    {
+      "id": "marketing",
+      "title": "Marketing",
+      "order": 5
+    },
+    {
+      "id": "support",
+      "title": "Support",
+      "order": 6
+    },
+    {
+      "id": "presentations",
+      "title": "Presentations",
+      "order": 7
+    }
+  ],
+  "templates": [
+    {
+      "slug": "hello-template",
+      "title": "Hello template",
+      "category": "documents",
+      "summary": "A tiny fixture template: a text file in, a greeting summary out.",
+      "takes": "One text file",
+      "gives": "A short greeting summary",
+      "icon": "doc",
+      "needs": {
+        "web": false,
+        "connections": [],
+        "secrets": []
+      },
+      "targets": [
+        "workflows",
+        "pulsar"
+      ],
+      "steps": [
+        "Read the file",
+        "Write the summary"
+      ],
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 462,
+          "sha256": "8944b477a0f520d191a00814180a3e68665d07ee8f37165823cf04ed497bc720"
+        },
+        {
+          "path": "evals/evals.json",
+          "size": 215,
+          "sha256": "064e4e1f2b8996d9b68b4953b941713be68139b85e6d74cad1708e553c7563d4"
+        },
+        {
+          "path": "samples/hello.txt",
+          "size": 28,
+          "sha256": "9a0da2380eaa6c9d2985342e0b3d2beccc5add47ab09bcb17a8b74cb82a45b57"
+        }
+      ]
+    }
+  ]
+}
