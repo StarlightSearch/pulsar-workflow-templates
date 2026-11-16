@@ -84,7 +84,7 @@ Writing rules, from good competitive-intelligence practice:
 - **Not observed is not absent**: write "not observed on <pages>, as of <date>", never "they don't offer".
 - **No motives**: record what a page says or what changed, not why ("moved SSO to the top plan", not "because they are going upmarket").
 - **Be fair**: do not shrink their strengths or inflate their weaknesses; an accurate profile is the useful one.
-- Every price, number and claim cites its page URL in brackets.
+- Every price, number and claim cites its page URL in brackets in the same sentence or table row, wherever it appears: a price table carries the URL on each row, and a price repeated in the comparison, the positioning paragraph, a takeaway or an inference cites it again.
 
 ### 4. Compare
 
