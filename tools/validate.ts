@@ -14,6 +14,9 @@ const SAFE_SEGMENT = /^[A-Za-z0-9._-]+$/;
 
 const schema = JSON.parse(readFileSync(resolve(import.meta.dirname, "schema/template.schema.json"), "utf8"));
 const checkSchema = new Ajv({ allErrors: true }).compile(schema);
+// Pulsar Workflows compiles output_schema in Ajv strict mode and refuses a run on an unknown keyword.
+// An unquoted description with a comma inside a YAML flow map ({ description: a, b }) splits into one.
+const strictAjv = new Ajv({ strict: true, logger: false });
 
 interface Entry {
   rel: string;
@@ -114,6 +117,13 @@ export function validateTemplate(dir: string): string[] {
     const md = readFileSync(join(dir, "SKILL.md"), "utf8");
     const meta = parseWorkflowMeta(md);
     for (const e of meta.errors) errors.push(`SKILL.md: ${e}`);
+    if (meta.outputSchema) {
+      try {
+        strictAjv.compile(meta.outputSchema);
+      } catch (e) {
+        errors.push(`SKILL.md: output_schema is not a valid strict JSON Schema (${(e as Error).message}); quote descriptions that contain a comma`);
+      }
+    }
     if (md.includes("—")) errors.push("SKILL.md contains an em-dash");
     if (tpl?.needs) {
       if (Array.isArray(tpl.needs.secrets) && !sameSet(tpl.needs.secrets, meta.secrets ?? []))

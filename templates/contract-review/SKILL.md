@@ -8,16 +8,16 @@ description: >-
 output_schema:
   type: object
   properties:
-    contract_type: { type: [string, "null"], description: For example software services, NDA, consultancy }
+    contract_type: { type: [string, "null"], description: "For example software services, NDA, consultancy" }
     parties:
       type: array
       items:
         type: object
         properties:
           name: { type: [string, "null"] }
-          role: { type: [string, "null"], description: As the contract names them, e.g. Supplier, Customer }
-    our_side: { type: [string, "null"], description: The party the review was done for }
-    basis: { type: [string, "null"], description: checklist in the request, or default checklist }
+          role: { type: [string, "null"], description: "As the contract names them, e.g. Supplier, Customer" }
+    our_side: { type: [string, "null"], description: "The party the review was done for" }
+    basis: { type: [string, "null"], description: "checklist in the request, or default checklist" }
     overall_risk: { type: [string, "null"], enum: [high, medium, low, null] }
     red_count: { type: integer }
     yellow_count: { type: integer }
@@ -27,7 +27,7 @@ output_schema:
       items:
         type: object
         properties:
-          clause_ref: { type: string, description: Clause number as printed, e.g. 7.2 }
+          clause_ref: { type: string, description: "Clause number as printed, e.g. 7.2" }
           topic: { type: string }
           rating: { type: string, enum: [RED, YELLOW, GREEN] }
           issue: { type: string }

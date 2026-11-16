@@ -35,6 +35,19 @@ describe("validateTemplate", () => {
     expect(has(validateTemplate(dir), /SKILL\.md/)).toBe(true);
   });
 
+  it("rejects an output_schema Workflows' strict compile refuses (unquoted comma in a flow map)", () => {
+    const [, dir] = fixture();
+    const md = read(join(dir, "SKILL.md"));
+    const bad = md.replace(
+      "description: Reads one text file and writes a one-line greeting summary of it.\n",
+      "description: Reads one text file and writes a one-line greeting summary of it.\noutput_schema:\n  type: object\n  properties:\n    currency: { type: string, description: ISO code such as EUR, USD or GBP }\n",
+    );
+    writeFileSync(join(dir, "SKILL.md"), bad);
+    expect(has(validateTemplate(dir), /strict JSON Schema/)).toBe(true);
+    writeFileSync(join(dir, "SKILL.md"), bad.replace("description: ISO code such as EUR, USD or GBP", 'description: "ISO code such as EUR, USD or GBP"'));
+    expect(validateTemplate(dir)).toEqual([]);
+  });
+
   it("rejects missing name or description", () => {
     const [, dir] = fixture();
     writeFileSync(join(dir, "SKILL.md"), "---\nname: hello-template\n---\n\n## Steps\n");

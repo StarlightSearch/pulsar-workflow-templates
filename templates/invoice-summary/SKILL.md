@@ -7,16 +7,16 @@ description: >-
 output_schema:
   type: object
   properties:
-    supplier: { type: [string, "null"], description: Supplier name as printed on the invoice }
-    invoice_number: { type: [string, "null"], description: Invoice number as printed }
-    invoice_date: { type: [string, "null"], description: Invoice date as an ISO date (YYYY-MM-DD) }
-    total: { type: [number, "null"], description: Invoice total including tax }
-    currency: { type: [string, "null"], description: ISO 4217 code such as EUR, USD or GBP }
-    due_date: { type: [string, "null"], description: Due date as an ISO date, printed or worked out from the payment terms }
-    subtotal: { type: [number, "null"], description: Total before tax }
-    tax: { type: [number, "null"], description: Tax amount }
-    checks_passed: { type: boolean, description: True when every arithmetic check that could run agreed }
-    issues: { type: array, items: { type: string }, description: Checks that failed, in plain words }
+    supplier: { type: [string, "null"], description: "Supplier name as printed on the invoice" }
+    invoice_number: { type: [string, "null"], description: "Invoice number as printed" }
+    invoice_date: { type: [string, "null"], description: "Invoice date as an ISO date (YYYY-MM-DD)" }
+    total: { type: [number, "null"], description: "Invoice total including tax" }
+    currency: { type: [string, "null"], description: "ISO 4217 code such as EUR, USD or GBP" }
+    due_date: { type: [string, "null"], description: "Due date as an ISO date, printed or worked out from the payment terms" }
+    subtotal: { type: [number, "null"], description: "Total before tax" }
+    tax: { type: [number, "null"], description: "Tax amount" }
+    checks_passed: { type: boolean, description: "True when every arithmetic check that could run agreed" }
+    issues: { type: array, items: { type: string }, description: "Checks that failed, in plain words" }
   required: [supplier, invoice_number, total, currency, due_date, checks_passed, issues]
 ---
 

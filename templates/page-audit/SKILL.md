@@ -9,9 +9,9 @@ output_schema:
   type: object
   properties:
     status: { type: string, enum: [ok, fetch_failed] }
-    url: { type: [string, "null"], description: The page as fetched, after redirects }
-    page_type: { type: [string, "null"], description: homepage, landing, pricing, feature, article, product, other }
-    primary_action: { type: [string, "null"], description: The one thing the page wants a visitor to do }
+    url: { type: [string, "null"], description: "The page as fetched, after redirects" }
+    page_type: { type: [string, "null"], description: "homepage, landing, pricing, feature, article, product, other" }
+    primary_action: { type: [string, "null"], description: "The one thing the page wants a visitor to do" }
     high: { type: integer }
     medium: { type: integer }
     low: { type: integer }
@@ -22,7 +22,7 @@ output_schema:
         properties:
           area: { type: string, enum: [seo, copy, technical] }
           priority: { type: string, enum: [high, medium, low] }
-          element: { type: string, description: The page element, e.g. title tag, H1, hero CTA button }
+          element: { type: string, description: "The page element, e.g. title tag, H1, hero CTA button" }
           issue: { type: string }
           fix: { type: string }
         required: [area, priority, element, issue, fix]

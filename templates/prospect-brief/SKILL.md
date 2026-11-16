@@ -7,10 +7,10 @@ description: >-
 output_schema:
   type: object
   properties:
-    status: { type: string, enum: [ok, fetch_failed], description: fetch_failed when the company's site could not be read }
+    status: { type: string, enum: [ok, fetch_failed], description: "fetch_failed when the company's site could not be read" }
     company: { type: [string, "null"] }
-    website: { type: [string, "null"], description: The site as fetched, after redirects }
-    what_they_do: { type: [string, "null"], description: One sentence }
+    website: { type: [string, "null"], description: "The site as fetched, after redirects" }
+    what_they_do: { type: [string, "null"], description: "One sentence" }
     fit: { type: [string, "null"], enum: [strong, moderate, poor, unknown, null] }
     fit_reason: { type: [string, "null"] }
     hooks:
@@ -23,7 +23,7 @@ output_schema:
     email_subject: { type: [string, "null"] }
     email_words: { type: [integer, "null"] }
     pages_read: { type: array, items: { type: string } }
-    not_verified: { type: array, items: { type: string }, description: What the site could not tell, e.g. headcount, funding }
+    not_verified: { type: array, items: { type: string }, description: "What the site could not tell, e.g. headcount, funding" }
   required: [status, company, website, fit, hooks, pages_read]
 ---
 

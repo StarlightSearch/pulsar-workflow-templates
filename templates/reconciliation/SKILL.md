@@ -8,12 +8,12 @@ description: >-
 output_schema:
   type: object
   properties:
-    period_end: { type: string, description: Last transaction date in either file, ISO date }
-    basis: { type: string, description: closing balances, or movements when the files have no balances }
-    matched_count: { type: integer, description: Transactions matched one to one with the same amount }
-    matched_total: { type: number, description: Net amount of the matched transactions, money in positive }
-    amount_differences_count: { type: integer, description: Pairs matched with a different amount (recording errors) }
-    amount_differences_total: { type: number, description: Bank amount minus ledger amount, summed over those pairs }
+    period_end: { type: string, description: "Last transaction date in either file, ISO date" }
+    basis: { type: string, description: "closing balances, or movements when the files have no balances" }
+    matched_count: { type: integer, description: "Transactions matched one to one with the same amount" }
+    matched_total: { type: number, description: "Net amount of the matched transactions, money in positive" }
+    amount_differences_count: { type: integer, description: "Pairs matched with a different amount (recording errors)" }
+    amount_differences_total: { type: number, description: "Bank amount minus ledger amount, summed over those pairs" }
     unmatched_bank_count: { type: integer }
     unmatched_bank_total: { type: number }
     unmatched_ledger_count: { type: integer }
@@ -22,7 +22,7 @@ output_schema:
     ledger_closing_balance: { type: [number, "null"] }
     adjusted_bank_balance: { type: number }
     adjusted_ledger_balance: { type: number }
-    difference: { type: number, description: Adjusted bank minus adjusted ledger; 0 when every difference is explained }
+    difference: { type: number, description: "Adjusted bank minus adjusted ledger; 0 when every difference is explained" }
     reconciled: { type: boolean }
   required: [matched_count, matched_total, unmatched_bank_count, unmatched_bank_total, unmatched_ledger_count, unmatched_ledger_total, difference, reconciled]
 ---

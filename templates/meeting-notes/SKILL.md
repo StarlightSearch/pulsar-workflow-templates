@@ -7,9 +7,9 @@ description: >-
 output_schema:
   type: object
   properties:
-    title: { type: [string, "null"], description: Meeting title }
-    date: { type: [string, "null"], description: Meeting date as an ISO date, null when the transcript does not give one }
-    decisions: { type: array, items: { type: string }, description: Each decision in one sentence }
+    title: { type: [string, "null"], description: "Meeting title" }
+    date: { type: [string, "null"], description: "Meeting date as an ISO date, null when the transcript does not give one" }
+    decisions: { type: array, items: { type: string }, description: "Each decision in one sentence" }
     actions:
       type: array
       description: Action items
@@ -17,11 +17,11 @@ output_schema:
         type: object
         properties:
           action: { type: string }
-          owner: { type: [string, "null"], description: Full name of the person who took it on, null when nobody did }
-          due: { type: [string, "null"], description: ISO date, or null when no date was said }
+          owner: { type: [string, "null"], description: "Full name of the person who took it on, null when nobody did" }
+          due: { type: [string, "null"], description: "ISO date, or null when no date was said" }
         required: [action, owner, due]
     open_questions: { type: array, items: { type: string } }
-    parked: { type: array, items: { type: string }, description: Ideas discussed and explicitly left undecided }
+    parked: { type: array, items: { type: string }, description: "Ideas discussed and explicitly left undecided" }
   required: [title, date, decisions, actions, open_questions, parked]
 ---
 

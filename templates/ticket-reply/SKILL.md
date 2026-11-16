@@ -7,7 +7,7 @@ description: >-
 output_schema:
   type: object
   properties:
-    summary: { type: string, description: One sentence, what the customer needs }
+    summary: { type: string, description: "One sentence, what the customer needs" }
     category: { type: string, enum: [bug, how-to, feature-request, billing, account, integration, security, data, performance] }
     secondary_category: { type: [string, "null"] }
     priority: { type: string, enum: [P1, P2, P3, P4] }
@@ -18,9 +18,9 @@ output_schema:
       properties:
         name: { type: [string, "null"] }
         email: { type: [string, "null"] }
-        account: { type: [string, "null"], description: Company, workspace or plan if the ticket says }
+        account: { type: [string, "null"], description: "Company, workspace or plan if the ticket says" }
     sentiment: { type: string, enum: [calm, confused, frustrated, angry] }
-    answered_from_articles: { type: string, enum: [fully, partly, "no"], description: How much of the ticket the help articles answer }
+    answered_from_articles: { type: string, enum: [fully, partly, "no"], description: "How much of the ticket the help articles answer" }
     sources:
       type: array
       items:
@@ -28,7 +28,7 @@ output_schema:
         properties:
           file: { type: string }
           heading: { type: string }
-    open_questions: { type: array, items: { type: string }, description: What the articles do not answer, for whoever picks it up }
+    open_questions: { type: array, items: { type: string }, description: "What the articles do not answer, for whoever picks it up" }
     internal_notes: { type: array, items: { type: string } }
   required: [summary, category, priority, route_to, sentiment, answered_from_articles, sources]
 ---

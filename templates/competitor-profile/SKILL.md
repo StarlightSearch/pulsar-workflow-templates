@@ -8,8 +8,8 @@ description: >-
 output_schema:
   type: object
   properties:
-    generated_on: { type: string, description: ISO date the sites were read }
-    our_product: { type: [string, "null"], description: What the request or knowledge base says we sell, if anything }
+    generated_on: { type: string, description: "ISO date the sites were read" }
+    our_product: { type: [string, "null"], description: "What the request or knowledge base says we sell, if anything" }
     competitors:
       type: array
       items:
@@ -18,11 +18,11 @@ output_schema:
           name: { type: string }
           url: { type: string }
           status: { type: string, enum: [ok, fetch_failed] }
-          tagline: { type: [string, "null"], description: The homepage headline as printed }
-          pricing_from: { type: [string, "null"], description: Lowest paid price as printed, with currency and period, or null if not observed }
-          free_plan: { type: [boolean, "null"], description: null when the pages read do not say }
-          free_trial: { type: [string, "null"], description: As printed, e.g. 14-day, card required }
-          positioning: { type: [string, "null"], description: One line, e.g. simplicity-first for small sites }
+          tagline: { type: [string, "null"], description: "The homepage headline as printed" }
+          pricing_from: { type: [string, "null"], description: "Lowest paid price as printed, with currency and period, or null if not observed" }
+          free_plan: { type: [boolean, "null"], description: "null when the pages read do not say" }
+          free_trial: { type: [string, "null"], description: "As printed, e.g. 14-day, card required" }
+          positioning: { type: [string, "null"], description: "One line, e.g. simplicity-first for small sites" }
           pages_read: { type: array, items: { type: string } }
         required: [name, url, status, pages_read]
     takeaways: { type: array, items: { type: string } }
