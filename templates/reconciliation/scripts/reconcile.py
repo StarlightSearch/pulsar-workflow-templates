@@ -32,9 +32,6 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from xlsx_cache import save_with_values  # noqa: E402
-
 RESULT_DIR = "/tmp/recon"
 SKIP_ROW = re.compile(r"opening balance|closing balance|balance b/?f|balance c/?f|brought forward|carried forward", re.I)
 FEE = re.compile(r"\b(fee|fees|charge|charges|commission|interest|overdraft)\b", re.I)
@@ -333,7 +330,6 @@ def write_xlsx(path, bank, ledger, pairs, exceptions, out, bank_base, led_base, 
     hf = Font(name="Arial", size=10, bold=True, color="FFFFFF")
     fill = PatternFill("solid", fgColor="1F2A36")
     money = "#,##0.00;(#,##0.00);-"
-    cache = {"Summary": {}}
 
     def header(ws, names, widths):
         for j, (n, w) in enumerate(zip(names, widths), 1):
@@ -358,7 +354,6 @@ def write_xlsx(path, bank, ledger, pairs, exceptions, out, bank_base, led_base, 
                 c.number_format = "dd/mm/yyyy"
             if j in (6, 7, 8):
                 c.number_format = money
-    n_ex = len(exceptions) + 1
 
     # Matched
     mt = wb.create_sheet("Matched")
@@ -381,7 +376,8 @@ def write_xlsx(path, bank, ledger, pairs, exceptions, out, bank_base, led_base, 
                 c.font = blue if j == 4 else f
                 c.number_format = "dd/mm/yyyy" if j == 1 else money if j == 4 else "General"
 
-    # Summary, the standard format, as formulas over Exceptions
+    # Summary, the standard format, as values. Not formulas: the run sandbox cannot
+    # recalculate, and a formula with no stored value shows as empty in previews.
     s = wb.create_sheet("Summary", 0)
     s.column_dimensions["A"].width = 46
     s.column_dimensions["B"].width = 16
@@ -390,40 +386,32 @@ def write_xlsx(path, bank, ledger, pairs, exceptions, out, bank_base, led_base, 
     s["A1"].font = Font(name="Arial", size=14, bold=True)
     s["A2"] = f"Period ending {date.fromisoformat(out['period_end']).strftime('%d/%m/%Y')}" + (" (movements only: no balances in the files)" if movements_only else "")
     s["A2"].font = Font(name="Arial", size=10, italic=True, color="5B6570")
-    rng = f"Exceptions!$K$2:$K${max(n_ex, 2)}"
-    amt = f"Exceptions!$H$2:$H${max(n_ex, 2)}"
 
-    def line(r, label, value=None, formula=None, cached=None, bold=False, inp=False):
+    def line(r, label, value, bold=False, inp=False):
         s.cell(r, 1, label).font = fb if bold else f
-        c = s.cell(r, 2, formula if formula else value)
+        c = s.cell(r, 2, value)
         c.font = fb if bold else blue if inp else f
         c.number_format = money
-        if formula:
-            cache["Summary"][f"B{r}"] = cached
 
     by_t = {}
     for e in exceptions:
         by_t[e["treatment"]] = round(by_t.get(e["treatment"], 0) + e["adjust"], 2)
     r = 4
-    line(r, "Movements per bank statement" if movements_only else "Balance per bank statement", value=bank_base, inp=True)
-    first_b = r
+    line(r, "Movements per bank statement" if movements_only else "Balance per bank statement", bank_base, inp=True)
     for t in ("Deposit in transit", "Outstanding payment", "Ledger item to investigate"):
         r += 1
-        line(r, LABELS[t], formula=f'=SUMIFS({amt},{rng},"{t}")', cached=by_t.get(t, 0))
+        line(r, LABELS[t], by_t.get(t, 0))
     r += 1
-    line(r, "Adjusted bank balance", formula=f"=SUM(B{first_b}:B{r - 1})", cached=out["adjusted_bank_balance"], bold=True)
-    adj_b = r
+    line(r, "Adjusted bank balance", out["adjusted_bank_balance"], bold=True)
     r += 2
-    line(r, "Movements per ledger" if movements_only else "Balance per ledger", value=led_base, inp=True)
-    first_l = r
+    line(r, "Movements per ledger" if movements_only else "Balance per ledger", led_base, inp=True)
     for t in ("Unrecorded bank charge", "Unrecorded bank credit", "Recording error", "Bank item to investigate"):
         r += 1
-        line(r, LABELS[t], formula=f'=SUMIFS({amt},{rng},"{t}")', cached=by_t.get(t, 0))
+        line(r, LABELS[t], by_t.get(t, 0))
     r += 1
-    line(r, "Adjusted ledger balance", formula=f"=SUM(B{first_l}:B{r - 1})", cached=out["adjusted_ledger_balance"], bold=True)
-    adj_l = r
+    line(r, "Adjusted ledger balance", out["adjusted_ledger_balance"], bold=True)
     r += 2
-    line(r, "Difference", formula=f"=B{adj_b}-B{adj_l}", cached=out["difference"], bold=True)
+    line(r, "Difference", out["difference"], bold=True)
     s.cell(r, 3, "Reconciled" if out["reconciled"] else "Not reconciled: see Exceptions").font = fb
     r += 2
     stats = [("Matched", out["matched_count"], out["matched_total"]), ("Amount differs", out["amount_differences_count"], out["amount_differences_total"]),
@@ -438,8 +426,8 @@ def write_xlsx(path, bank, ledger, pairs, exceptions, out, bank_base, led_base, 
         c = s.cell(r, 3, tot)
         c.font, c.number_format = f, money
     r += 2
-    s.cell(r, 1, "Blue = taken from the files. The adjustments are formulas over the Exceptions sheet. Prepared automatically; review before sign-off.").font = Font(name="Arial", size=9, italic=True, color="5B6570")
-    save_with_values(wb, path, cache)
+    s.cell(r, 1, "Blue = taken from the files. Each adjustment is the total of its treatment on the Exceptions sheet. Prepared automatically; review before sign-off.").font = Font(name="Arial", size=9, italic=True, color="5B6570")
+    wb.save(path)
 
 
 if __name__ == "__main__":

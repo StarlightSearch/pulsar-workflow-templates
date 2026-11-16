@@ -35,7 +35,7 @@ Does the month-end bank reconciliation: every bank line is matched to a ledger e
 
 - **Bank statement**: a CSV or Excel export for one account and period, in /workspace/inputs/.
 - **Ledger**: the cash account's entries for the same period (CSV or Excel), in /workspace/inputs/. A general ledger with several accounts also works; the run picks out the bank account.
-- **Notes**: optional text, for example which account to use, the period, or known items ("the 1,240 payment to Halden went out on 30/10").
+- **Notes**: optional text, for example which account to use, the period, or known items ("the 860.00 transfer to the landlord went out on the last day of the month").
 
 ## Steps
 
@@ -59,7 +59,7 @@ It prints the columns it used, the balances, and every exception, and writes /wo
 
 Check before going on:
 
-- **Signs**: money in is positive on both sides. Payroll, rent and supplier payments should be negative in the Matched sheet. If a side is inverted, rerun with `--flip-bank` or `--flip-ledger`.
+- **Signs**: money in is positive on both sides. Payments out (wages, suppliers, fees) should be negative in the Matched sheet, customer receipts positive. If a side is inverted, rerun with `--flip-bank` or `--flip-ledger`.
 - **Columns**: if it picked the wrong column (or could not find one), rerun with `--bank-cols date=...,desc=...,amount=...` or `--ledger-cols ...` using the real header names (keys: date, desc, ref, amount, in, out, balance).
 - **Balances**: the opening balances it reports should agree. If they do not, the difference comes from an earlier period: say so, it is not an item in this one.
 - If many items are unmatched only because the dates are far apart, rerun with `--window 10` and say so.
@@ -82,11 +82,11 @@ Flag for review any item over 1,000 in the account's currency or older than 30 d
 
 Write /workspace/out/exceptions.md for the reviewer.
 
-- **Status** first, one line: "Reconciled: adjusted balances agree at 15,921.03 EUR" or "Not reconciled: 250.00 unexplained".
-- **The reconciliation** in the standard format: balance per bank, each adjustment on the bank side, adjusted bank balance; balance per ledger, each adjustment on the ledger side, adjusted ledger balance; difference. Use the numbers from /tmp/recon/result.json.
+- **Status** first, one line: "Reconciled: adjusted balances agree at 8,402.15 GBP" or "Not reconciled: 250.00 unexplained".
+- **The reconciliation** in the standard format: balance per bank, each adjustment on the bank side, adjusted bank balance; balance per ledger, each adjustment on the ledger side, adjusted ledger balance; difference. Use the numbers from /tmp/recon/result.json, which match the workbook's Summary sheet.
 - **Exceptions**: a table with date (dd/mm/yyyy), description, amount, category, and the action. Investigation items first, then by size.
 - **Proposed journal entries** for every "Adjustment required" item, as debit and credit lines with the amount. A bank charge is debit Bank charges, credit Cash at bank. A receipt recorded too high is debit the account it was posted from (usually Accounts receivable), credit Cash at bank, for the difference; recorded too low, the reverse. Mark them as proposed.
-- **Matched with a date gap** in one line if any (for example "Bramble Studios, 1,980.00: ledger 24/10, bank 27/10").
+- **Matched with a date gap** in one line if any (for example "Client receipt, 640.00: ledger 12/03, bank 15/03").
 
 Keep it to one page. Write amounts with thousands separators and two decimals, and name the currency once.
 
@@ -98,7 +98,7 @@ Then add `## Assumptions`: which file you treated as which, the account and peri
 
 ## Output
 
-- **reconciliation.xlsx**: Summary (the reconciliation as formulas over the Exceptions sheet), Exceptions, Matched, and the Bank and Ledger entries as read.
+- **reconciliation.xlsx**: Summary (the reconciliation, each adjustment the total of its treatment on the Exceptions sheet), Exceptions, Matched, and the Bank and Ledger entries as read.
 - **exceptions.md**: status, the reconciliation, each exception with its action, and proposed journal entries.
 - **output.json**: matched and unmatched counts and totals, balances, difference.
 
