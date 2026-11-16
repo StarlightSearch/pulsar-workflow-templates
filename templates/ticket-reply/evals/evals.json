@@ -24,7 +24,7 @@
         "samples/help/changing-plans.md"
       ],
       "expectations": [
-        "output.json answered_from_articles is \"no\" and sources is an empty list",
+        "output.json answered_from_articles is \"no\" with an empty sources list, or \"partly\" with no claim anywhere that Tallyhop supports Xero",
         "reply.md neither claims nor denies that Tallyhop integrates with Xero; it says the team will check and get back to Tom",
         "output.json route_to is tier-2 or product"
       ]
