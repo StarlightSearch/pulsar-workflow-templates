@@ -4,7 +4,7 @@ Usage: python3 build_report.py <review.json> <contract.txt> <out_dir>
 
 review.json is the run's analysis (shape in SKILL.md step 3). The script:
   - checks every finding has a clause reference, a rating of RED, YELLOW or
-    GREEN, and (for RED and YELLOW) a proposed redline;
+    GREEN, and (for RED and YELLOW) a quote and a proposed redline;
   - checks every "contract_says" quote really appears in the contract text
     (ignoring case, spacing and punctuation), so nothing is misquoted;
   - writes <out_dir>/issues.docx (RED first, then YELLOW, then GREEN) and
@@ -57,6 +57,8 @@ def check(review: dict, contract_text: str) -> list[str]:
         if rating in ("RED", "YELLOW") and not str(f.get("redline", "")).strip():
             problems.append(f"{name}: a {rating} finding needs a proposed redline")
         quote = str(f.get("contract_says", "")).strip().strip('"')
+        if rating in ("RED", "YELLOW") and not quote:
+            problems.append(f"{name}: a {rating} finding needs a contract_says quote of the clause's wording")
         if quote and norm(quote) not in text:
             problems.append(f"{name}: the quote in contract_says is not in the contract; copy it exactly or shorten it")
     for key in ("our_side", "basis", "overall_risk"):

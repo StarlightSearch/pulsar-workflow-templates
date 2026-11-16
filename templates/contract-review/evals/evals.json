@@ -2,7 +2,9 @@
   "evals": [
     {
       "prompt": "Review this software services agreement. We are the customer (Fernhill Home Goods). Our checklist: 1) liability capped for both sides at no less than 12 months' fees, mutual; 2) initial term up to 12 months, renewals no longer than 12 months, notice to stop a renewal no more than 60 days; 3) we can terminate for convenience on 90 days' notice; 4) annual price increases capped at 5%; 5) personal data breaches notified to us within 48 hours; 6) we own our data and anything built specifically for us; 7) English law.",
-      "files": ["samples/contract.pdf"],
+      "files": [
+        "samples/contract.pdf"
+      ],
       "expectations": [
         "issues.docx rates the limitation of liability RED citing clause 9.4 (or 9.2 and 9.4), and says the Customer's liability is unlimited while the Supplier's is capped at three months' fees",
         "issues.docx flags clause 3.2 as RED or YELLOW: 24-month automatic renewals with 120 days' notice, against the checklist's 12 months and 60 days",
@@ -11,11 +13,13 @@
       ]
     },
     {
-      "prompt": "We're the customer on this one. Can you review it before we sign?",
-      "files": ["samples/contract.pdf"],
+      "prompt": "We're the customer on this one, it's the Word version. Can you review it before we sign?",
+      "files": [
+        "samples/contract.docx"
+      ],
       "expectations": [
         "output.json basis is 'default checklist' and the answer's Assumptions section says the default checklist was used",
-        "issues.docx rates the limitation of liability RED with a clause reference in clause 9",
+        "issues.docx rates the limitation of liability RED with a clause reference in clause 9 (for example 9.4), read from the Word file's automatic numbering",
         "issues.docx flags clause 4.3 (annual increases of up to 15%) as RED or YELLOW"
       ]
     }

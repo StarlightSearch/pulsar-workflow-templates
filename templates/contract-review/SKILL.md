@@ -51,12 +51,13 @@ Reads a contract the way a careful in-house reviewer would: the whole document f
 
 Extract the contract's text and the list of numbered clauses, so every finding can quote and cite the right clause.
 
-Check the libraries first: run `python3 -c "import docx, pypdf"`; if it fails, run `pip install --quiet --user --break-system-packages python-docx pypdf`, check again, and if it still fails say which package is missing and stop.
+Check the libraries first: run `python3 -c "import docx"`; if it fails, run `pip install --quiet --user --break-system-packages python-docx`, check again, and if it still fails say it is missing and stop. For a PDF, also run `command -v pdftotext`; only if that finds nothing, make sure `python3 -c "import pypdf"` works the same way (install `pypdf` if it fails).
 
 Run `python3 /workspace/workflow/scripts/extract_text.py <contract> /tmp/contract.txt` with the contract's path from /workspace/inputs/ (if there are several files, review the first contract by name and list the others under Assumptions). It prints the page count, whether the PDF looks scanned, and the clause numbers it found. Then read /tmp/contract.txt from start to finish before judging anything: clauses interact (a broad indemnity can sit outside a liability cap; a renewal clause can turn a short term into a long one).
 
 - If it reports `scanned: true`, the PDF is an image with no text layer: say it needs OCR first and stop, writing no report.
 - If it reports an `error` (`encrypted`, `unreadable`, `unsupported`), say so with its `detail` and stop.
+- For a Word file, automatic list numbers ("1.", "1.1") are rebuilt and written into the text; `numbers_rebuilt` says how many. If it reports `auto_numbered: true`, some numbering could not be rebuilt: work out each clause's number by counting the headings and numbered paragraphs in order, use those numbers as `clause_ref`, and say under Assumptions that the references were counted rather than read.
 - If the contract is not in English, review it in its own language, write the report in English, and say so.
 
 ### 2. Set the basis
@@ -81,7 +82,7 @@ Ratings:
 For each finding:
 
 - `clause_ref` is the number as printed (the extract's clause list helps); use the most specific sub-clause. A topic the contract does not cover goes under `missing`, not `findings`.
-- `contract_says` is a short exact quote (one sentence or less) copied from /tmp/contract.txt. The build script checks it.
+- `contract_says` is a short exact quote (one sentence or less) copied from /tmp/contract.txt, without the clause number in front; every RED and YELLOW finding needs one. The build script checks it.
 - `issue` and `impact` say what the clause does to our side in practice, in plain words, with the numbers (for example "a 6-week notice window on a 3-year renewal").
 - `redline` (RED and YELLOW) is replacement wording ready to paste, measured to the checklist position, and `fallback` is the position to accept if the other side refuses. `priority` is Must-have (RED), Should-have or Nice-to-have.
 
@@ -122,7 +123,7 @@ Run the script that checks the review and writes the deliverables.
 
 `python3 /workspace/workflow/scripts/build_report.py /tmp/review.json /tmp/contract.txt /workspace/out`
 
-It writes /workspace/out/issues.docx (summary table, top issues, then each clause RED first with its quote, issue, redline and fallback) and /workspace/out/output.json. It prints a `PROBLEM:` line for each finding without a clause reference, a missing redline, or a quote that is not in the contract. Fix /tmp/review.json and rerun until it prints `ok`; a misquote usually means a word was paraphrased, so copy the sentence again from /tmp/contract.txt.
+It writes /workspace/out/issues.docx (summary table, top issues, then each clause RED first with its quote, issue, redline and fallback) and /workspace/out/output.json. It prints a `PROBLEM:` line for each finding without a clause reference, a RED or YELLOW finding without a quote or a redline, or a quote that is not in the contract. Fix /tmp/review.json and rerun until it prints `ok`; a misquote usually means a word was paraphrased, so copy the sentence again from /tmp/contract.txt.
 
 ### 5. Answer
 
