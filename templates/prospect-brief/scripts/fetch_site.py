@@ -354,13 +354,17 @@ def main(argv: list[str]) -> None:
         for l in start["links"]["internal"]:
             if len(checked) >= nl:
                 break
-            if SKIP_EXT.search(urlparse(l["url"]).path) or l["url"].rstrip("/") == start["final_url"].rstrip("/"):
+            lp = urlparse(l["url"]).path
+            if SKIP_EXT.search(lp) or SKIP_PATH.search(lp) or l["url"].rstrip("/") == start["final_url"].rstrip("/"):
                 continue
             r = get(session, l["url"], timeout, method="HEAD")
             if "error" not in r and r["status"] in (405, 403, 501):
                 r = get(session, l["url"], timeout)
             checked.append({"url": l["url"], "text": l["text"], "status": r.get("status"), "error": r.get("detail")})
-        summary["link_check"] = {"checked": len(checked), "broken": [c for c in checked if c["error"] or (c["status"] or 0) >= 400]}
+        # 401/403/429 usually mean the site refuses automated checks, not a broken link.
+        restricted = [c for c in checked if c["status"] in (401, 403, 429)]
+        broken = [c for c in checked if c not in restricted and (c["error"] or (c["status"] or 0) >= 400)]
+        summary["link_check"] = {"checked": len(checked), "broken": broken, "restricted": restricted}
 
     with open(os.path.join(out_dir, "site.json"), "w", encoding="utf-8") as fh:
         json.dump(summary, fh, indent=1)
