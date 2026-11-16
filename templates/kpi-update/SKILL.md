@@ -26,7 +26,7 @@ Check the libraries first: run `python3 -c "import pandas, openpyxl, matplotlib"
 Take the file path from /workspace/inputs/ and read the first rows with pandas. Decide:
 
 - **Metrics**: every numeric column, unless it is an id or a code. Leave out columns that are obviously not KPIs and say so.
-- **Rates**: if two metrics form a natural rate, add it, at most two: a conversion rate (an outcome per visit, lead or trial) and an average value (an amount per order or per customer) are the usual ones. A rate often explains a move better than either count.
+- **Rates**: if two metrics form a natural rate, add it, at most three (each rate is another panel in the chart and row in the table, so more crowd the update): a conversion rate (an outcome per visit, lead or trial) and an average value (an amount per order or per customer) are the usual ones. In a funnel with several steps (visits, then leads, then sales), add the rate for each step you may need to explain a move, such as leads per visit as well as sales per visit. A rate often explains a move better than either count.
 - **Lower is better**: refunds, churn, cancellations, costs, complaints, errors and response times. Everything else is higher is better.
 - **Partial period**: decide from the data, never from today's date. Treat the last row as incomplete only when the file or the Context says so (a note, a "partial" or "to date" label, a column marking it), or when step 2 reports `last_period_looks_partial: true` (every count fell by more than 35% at once, steady ones included, which is what a cut-off period looks like). Then rerun step 2 with `--drop-last` and say so in the update. Otherwise the last row is the latest period.
 
@@ -47,7 +47,7 @@ For each metric with `moved: true`, work out the most likely driver from the oth
 - Trace counts back through the funnel: if an outcome fell while the step before it held steady, the problem is the conversion between them, not the volume coming in; if an amount fell with the count while the average value held, it is volume, not price.
 - A move that undoes an earlier spike (a cost back to its usual level after a one-off period) is a return to normal: say that rather than calling it a gain or a loss.
 - Use the Context input when it explains a period. Otherwise do not invent outside causes such as a campaign, a holiday or a bug: say what the data shows, that it does not say why, and the one thing worth checking first.
-- Quantify every claim with the latest value, the change in percent, and the comparison it is against.
+- Quantify every claim with the latest value, the change in percent, and the comparison it is against. Every number in the update comes from the summary: if the explanation needs a rate step 2 did not compute, rerun step 2 with that `--ratio` added rather than working it out by hand, so the update, the chart and the workbook agree.
 - Sanity check before writing: changes have the sign you describe, rates are between 0 and 100%, and the period count matches the file. Note any missing values or gaps the summary reports.
 
 ### 4. Write the update
@@ -75,11 +75,12 @@ Write /workspace/out/update.md in this shape, short enough to read in a minute:
 ![Metrics over the last 12 months](chart.png)
 ```
 
-- The headline is one sentence naming the biggest move and its size.
+- The headline is one sentence naming the biggest move and its size. When several metrics moved for one reason, name the one where it starts (the first step of the funnel that fell or rose, found in step 3) with its size, then what followed from it; a downstream total alone hides the cause.
 - The table has every metric, with numbers formatted for reading (thousands separators, rates as percentages, money with its currency).
 - "What moved" has one bullet per moved metric, biggest business impact first. Group metrics that moved for one reason into one bullet.
 - If nothing moved, say "A steady week" in the headline and keep "What moved" to one line.
 - Dates are written dd/mm/yyyy.
+- The chart line is the last line of update.md. Assumptions go in the answer (step 5), not in the file: the file is what gets posted.
 
 ### 5. Answer
 
