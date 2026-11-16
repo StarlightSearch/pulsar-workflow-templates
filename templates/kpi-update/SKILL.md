@@ -3,7 +3,7 @@ name: kpi-update
 description: >-
   Reads a metrics table (CSV or Excel, one row per week or month) and writes a
   short KPI update: what changed since the last period, what moved and why it
-  likely did, with a chart and a workbook of live formulas.
+  likely did, with a chart and a workbook.
 ---
 
 # KPI update
@@ -24,26 +24,26 @@ Open the file and decide which columns are metrics, what one row covers, and how
 Take the file path from /workspace/inputs/ and read the first rows with pandas. Decide:
 
 - **Metrics**: every numeric column, unless it is an id or a code. Leave out columns that are obviously not KPIs and say so.
-- **Rates**: if two metrics form a natural rate, add it, at most two: conversion (signups or orders per visitor) and average value (revenue per order) are the usual ones. A rate often explains a move better than either count.
+- **Rates**: if two metrics form a natural rate, add it, at most two: a conversion rate (an outcome per visit, lead or trial) and an average value (an amount per order or per customer) are the usual ones. A rate often explains a move better than either count.
 - **Lower is better**: refunds, churn, cancellations, costs, complaints, errors and response times. Everything else is higher is better.
-- **Partial period**: run `date +%F`. If the latest row's period has not finished yet (a week starting less than 7 days ago, a month not yet over), say so in the update and compare the latest complete period instead by dropping that row into a copy of the file under /tmp.
+- **Partial period**: decide from the data, never from today's date. Treat the last row as incomplete only when the file or the Context says so (a note, a "partial" or "to date" label, a column marking it), or when step 2 reports `last_period_looks_partial: true` (every count fell by more than 35% at once, steady ones included, which is what a cut-off period looks like). Then rerun step 2 with `--drop-last` and say so in the update. Otherwise the last row is the latest period.
 
 ### 2. Compute the numbers
 
 Run the analysis script, which does all the arithmetic, the chart and the workbook.
 
-`python3 /workspace/workflow/scripts/analyse.py <file> /workspace/out --ratio signup_rate=signups/visitors --ratio avg_order_value=revenue_eur/orders --lower-is-better refunds_eur`
+`python3 /workspace/workflow/scripts/analyse.py <file> /workspace/out --ratio <rate name>=<numerator column>/<denominator column> --lower-is-better <column> <column>`
 
-Use your own column names; leave out `--ratio` and `--lower-is-better` when nothing applies. Add `--date <column>` if the script cannot find the date column.
+For example `--ratio tickets_per_account=tickets/active_accounts --lower-is-better tickets churned`. Leave out `--ratio` and `--lower-is-better` when nothing applies. Add `--date <column>` if the script cannot find the date column.
 
-It writes /workspace/out/chart.png and /workspace/out/workbook.xlsx and prints a summary (also saved to /tmp/kpi/summary.json): for each metric the latest value, the change against the previous period and against the average of the four before it, a flag `moved` (15% or more against the previous period, or far outside the last eight), and `earlier_spikes` for unusual periods before the latest one. Use these numbers as given; do not recompute them by hand.
+It writes /workspace/out/chart.png and /workspace/out/workbook.xlsx and prints a summary (also saved to /tmp/kpi/summary.json): for each metric the latest value, the change against the previous period and against the average of the four before it, a flag `moved` (15% or more against the previous period, or far outside the last eight), `earlier_spikes` for unusual periods before the latest one, and `last_period_looks_partial` (see step 1). Use these numbers as given; do not recompute them by hand.
 
 ### 3. Explain what moved
 
 For each metric with `moved: true`, work out the most likely driver from the other metrics, and check the explanation holds.
 
-- Trace counts back through the funnel: if signups fell while visitors held steady, the problem is conversion, not traffic; if revenue fell with orders while average order value held, it is volume, not price.
-- A move that undoes an earlier spike (refunds back to normal after a one-off week) is a return to normal: say that rather than calling it a gain.
+- Trace counts back through the funnel: if an outcome fell while the step before it held steady, the problem is the conversion between them, not the volume coming in; if an amount fell with the count while the average value held, it is volume, not price.
+- A move that undoes an earlier spike (a cost back to its usual level after a one-off period) is a return to normal: say that rather than calling it a gain or a loss.
 - Use the Context input when it explains a period. Otherwise do not invent outside causes such as a campaign, a holiday or a bug: say what the data shows, that it does not say why, and the one thing worth checking first.
 - Quantify every claim with the latest value, the change in percent, and the comparison it is against.
 - Sanity check before writing: changes have the sign you describe, rates are between 0 and 100%, and the period count matches the file. Note any missing values or gaps the summary reports.
@@ -53,24 +53,24 @@ For each metric with `moved: true`, work out the most likely driver from the oth
 Write /workspace/out/update.md in this shape, short enough to read in a minute:
 
 ```markdown
-# KPI update: week of 09/11/2026
+# KPI update: month of 03/2026
 
-**Signups fell 26% this week while traffic held steady, taking orders and revenue down with them.**
+**Support tickets rose 31% in March while active accounts grew only 4%, so tickets per account are up a quarter.**
 
-| Metric | This week | vs last week | vs 4-week average |
+| Metric | This month | vs last month | vs 4-month average |
 |---|---|---|---|
-| Visitors | 21,049 | -1.1% | +2.9% |
+| Active accounts | 4,120 | +4.0% | +6.2% |
 
 ## What moved
-- **Signups: 467, down 26.5% on last week** and 25.7% under the 4-week average. Visitors were flat (-1.1%), so the signup rate fell from 3.0% to 2.2%: the drop is in conversion, not traffic. Check the signup page first.
+- **Tickets: 1,388, up 31.0% on February** and 28.4% above the 4-month average. Accounts grew 4.0%, so tickets per account rose from 0.27 to 0.34: the rise is per customer, not from growth. Check which ticket topics grew first.
 
 ## Worth watching
 - One or two lines on earlier spikes or slow trends worth a look.
 
 ## About the data
-12 weeks, 24/08/2026 to 09/11/2026. Anything partial, missing or assumed.
+12 months, 04/2025 to 03/2026. Anything partial, missing or assumed.
 
-![Metrics over the last 12 weeks](chart.png)
+![Metrics over the last 12 months](chart.png)
 ```
 
 - The headline is one sentence naming the biggest move and its size.
@@ -89,7 +89,7 @@ Then add `## Assumptions`: the metrics you left out, the rates you added, what y
 
 - **update.md**: the KPI update.
 - **chart.png**: one small chart per metric, the latest point marked (red when it moved the wrong way, green the right way).
-- **workbook.xlsx**: the data (inputs in blue) and a Summary sheet of live formulas for the latest period, previous period, change and 4-period average.
+- **workbook.xlsx**: the data (inputs in blue, with any rates) and a Summary sheet with the latest period, previous period, change and 4-period average for each metric.
 
 ## Adapting this
 

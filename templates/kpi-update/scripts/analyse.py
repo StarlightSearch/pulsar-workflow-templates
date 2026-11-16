@@ -2,13 +2,13 @@
 
 Usage:
   python3 analyse.py <metrics.csv|.xlsx> <out_dir> [--date COL] [--ratio NAME=NUM/DEN ...]
-                     [--threshold 0.15] [--lower-is-better COL ...]
+                     [--threshold 0.15] [--lower-is-better COL ...] [--drop-last]
 
 Reads one row per period (a date column plus numeric metric columns; a long
 table of date, metric, value is pivoted). Lines starting with # are skipped.
 Writes:
   <out_dir>/chart.png      small multiples, one panel per metric, latest point marked
-  <out_dir>/workbook.xlsx  Data sheet (inputs) and Summary sheet (live formulas)
+  <out_dir>/workbook.xlsx  Data sheet (inputs) and Summary sheet (values)
   /tmp/kpi/summary.json    the numbers the update is written from
 and prints summary.json.
 
@@ -31,9 +31,6 @@ import pandas as pd  # noqa: E402
 from openpyxl import Workbook  # noqa: E402
 from openpyxl.styles import Alignment, Font, PatternFill  # noqa: E402
 from openpyxl.utils import get_column_letter  # noqa: E402
-
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from xlsx_cache import save_with_values  # noqa: E402
 
 SUMMARY_DIR = "/tmp/kpi"
 
@@ -92,9 +89,17 @@ def main():
     ap.add_argument("--ratio", action="append", default=[])
     ap.add_argument("--threshold", type=float, default=0.15)
     ap.add_argument("--lower-is-better", nargs="*", default=[])
+    ap.add_argument("--drop-last", action="store_true", help="leave out the last period (it is incomplete)")
     a = ap.parse_args()
 
     df, dcol, metrics = load(a.src, a.date)
+    dropped = None
+    if a.drop_last and len(df) > 2:
+        dropped = df[dcol].iloc[-1].date().isoformat()
+        df = df.iloc[:-1].reset_index(drop=True)
+    # A cut-off period looks like every count falling sharply at once, steady ones included.
+    falls = [pct(df[m].iloc[-1], df[m].iloc[-2]) for m in metrics] if len(df) >= 2 else []
+    looks_partial = bool(falls) and all(f is not None and f < -0.35 for f in falls)
     if len(df) < 2:
         sys.exit("Need at least two periods to compare.")
     ratio_cols = []
@@ -145,7 +150,7 @@ def main():
 
     gaps = int((df[dcol].diff().dt.days > 1.6 * df[dcol].diff().dt.days.median()).sum())
     summary = {
-        "period_unit": unit, "periods": len(df),
+        "period_unit": unit, "periods": len(df), "dropped_last_period": dropped, "last_period_looks_partial": looks_partial,
         "first_period": df[dcol].iloc[0].date().isoformat(), "latest_period": df[dcol].iloc[-1].date().isoformat(),
         "previous_period": df[dcol].iloc[-2].date().isoformat(), "threshold_pct": a.threshold * 100,
         "metrics": rows, "earlier_spikes": spikes,
@@ -208,87 +213,71 @@ def chart(df, dcol, allm, unit, path, info):
 
 
 def workbook(df, dcol, metrics, ratio_cols, unit, path):
+    """Data sheet (the input as read, plus any rates) and Summary sheet, all as values.
+
+    Values, not formulas: the run sandbox cannot recalculate a workbook, and a
+    formula with no stored value shows as empty in previews and to pandas. The
+    numbers are the same ones the update is written from.
+    """
     wb = Workbook()
     base = Font(name="Arial", size=10)
     bold = Font(name="Arial", size=10, bold=True)
-    blue = Font(name="Arial", size=10, color="0000FF")  # hard-coded inputs
+    blue = Font(name="Arial", size=10, color="0000FF")  # taken from the input file
     head_fill = PatternFill("solid", fgColor="1F2A36")
     head_font = Font(name="Arial", size=10, bold=True, color="FFFFFF")
+    ratio_names = [r["name"] for r in ratio_cols]
+    allm = metrics + ratio_names
 
-    cache = {"Data": {}, "Summary": {}}
+    def fmt(m):
+        vals = df[m].dropna()
+        if m in ratio_names and float(vals.abs().max() or 0) <= 1:
+            return "0.00%"
+        return "#,##0" if float(vals.abs().max() or 0) >= 100 and (vals % 1 == 0).all() else "#,##0.00"
+
     data = wb.active
     data.title = "Data"
-    cols = [dcol] + metrics
-    for j, c in enumerate(cols, 1):
+    for j, c in enumerate([dcol] + allm, 1):
         cell = data.cell(1, j, c)
         cell.font, cell.fill = head_font, head_fill
         data.column_dimensions[get_column_letter(j)].width = 14
-    for i, row in df.iterrows():
+    for i, row in df.reset_index(drop=True).iterrows():
         r = i + 2
         d = data.cell(r, 1, row[dcol].date())
         d.number_format, d.font = "dd/mm/yyyy", base
-        for j, m in enumerate(metrics, 2):
+        for j, m in enumerate(allm, 2):
             v = row[m]
             c = data.cell(r, j, None if pd.isna(v) else float(v))
-            c.font = blue
-            c.number_format = "#,##0" if float(df[m].dropna().abs().max() or 0) >= 100 and (df[m].dropna() % 1 == 0).all() else "#,##0.00"
-    # ratio columns as formulas on the Data sheet
-    letter = {m: get_column_letter(j) for j, m in enumerate(cols, 1)}
-    for k, rc in enumerate(ratio_cols):
-        j = len(cols) + 1 + k
-        col = get_column_letter(j)
-        letter[rc["name"]] = col
-        h = data.cell(1, j, rc["name"])
-        h.font, h.fill = head_font, head_fill
-        data.column_dimensions[col].width = 14
-        for r in range(2, len(df) + 2):
-            c = data.cell(r, j, f'=IF({letter[rc["den"]]}{r}=0,"",{letter[rc["num"]]}{r}/{letter[rc["den"]]}{r})')
-            v = df[rc["name"]].iloc[r - 2]
-            cache["Data"][f"{col}{r}"] = "" if pd.isna(v) else float(v)
-            c.font, c.number_format = base, "0.00%" if float(df[rc["name"]].max()) <= 1 else "#,##0.00"
+            c.font = base if m in ratio_names else blue
+            c.number_format = fmt(m)
     data.freeze_panes = "B2"
-    last, prev = len(df) + 1, len(df)
 
     s = wb.create_sheet("Summary", 0)
     s["A1"], s["A1"].font = "KPI update", Font(name="Arial", size=14, bold=True)
-    s["A2"] = "Latest"
-    s["B2"] = f"=Data!A{last}"
-    s["A3"] = "Previous"
-    s["B3"] = f"=Data!A{prev}"
-    cache["Summary"].update(B2=df[dcol].iloc[-1].date(), B3=df[dcol].iloc[-2].date())
-    for c in ("A2", "A3"):
-        s[c].font = bold
-    for c in ("B2", "B3"):
-        s[c].font, s[c].number_format = base, "dd/mm/yyyy"
+    for r, (label, d) in enumerate((("Latest", df[dcol].iloc[-1]), ("Previous", df[dcol].iloc[-2])), 2):
+        s.cell(r, 1, label).font = bold
+        c = s.cell(r, 2, d.date())
+        c.font, c.number_format = base, "dd/mm/yyyy"
     hdr = ["Metric", f"Latest {unit}", f"Previous {unit}", "Change", "Change %", "4-period average", "vs average %"]
     for j, h in enumerate(hdr, 1):
         c = s.cell(5, j, h)
         c.font, c.fill = head_font, head_fill
         c.alignment = Alignment(horizontal="center", wrap_text=True)
         s.column_dimensions[get_column_letter(j)].width = 16 if j > 1 else 22
-    first4 = max(2, last - 4)
-    for i, m in enumerate(metrics + [r["name"] for r in ratio_cols]):
+    for i, m in enumerate(allm):
         r = 6 + i
-        L = letter[m]
-        fmt = data[f"{L}2"].number_format
-        s.cell(r, 1, m).font = base
-        s.cell(r, 2, f"=Data!{L}{last}")
-        s.cell(r, 3, f"=Data!{L}{prev}")
-        s.cell(r, 4, f"=B{r}-C{r}")
-        s.cell(r, 5, f'=IF(C{r}=0,"",B{r}/C{r}-1)')
-        s.cell(r, 6, f"=AVERAGE(Data!{L}{first4}:{L}{last - 1})")
-        s.cell(r, 7, f'=IF(F{r}=0,"",B{r}/F{r}-1)')
         ser = df[m]
-        lv, pv, av = float(ser.iloc[-1]), float(ser.iloc[-2]), float(ser.iloc[first4 - 2:last - 2].mean())
-        cache["Summary"].update({f"B{r}": lv, f"C{r}": pv, f"D{r}": lv - pv, f"E{r}": "" if pv == 0 else lv / pv - 1,
-                                 f"F{r}": av, f"G{r}": "" if av == 0 else lv / av - 1})
-        for j in range(2, 8):
-            c = s.cell(r, j)
+        lv, pv = float(ser.iloc[-1]), float(ser.iloc[-2])
+        av = float(ser.iloc[max(0, len(ser) - 5):-1].mean())  # the same window as summary.json
+        vals = [m, lv, pv, lv - pv, None if pv == 0 else lv / pv - 1, av, None if av == 0 else lv / av - 1]
+        for j, v in enumerate(vals, 1):
+            c = s.cell(r, j, v)
             c.font = base
-            c.number_format = "0.0%;-0.0%;-" if j in (5, 7) else fmt
-    note = 7 + len(metrics) + len(ratio_cols)
-    s.cell(note, 1, "Inputs are on the Data sheet (blue). Every number here is a formula, so it updates when you paste new rows and adjust the row references.").font = Font(name="Arial", size=9, italic=True, color="5B6570")
-    save_with_values(wb, path, cache)
+            if j > 1:
+                c.number_format = "0.0%;-0.0%;0.0%" if j in (5, 7) else fmt(m)
+    note = 7 + len(allm)
+    s.cell(note, 1, "Values as of this update. The input data is on the Data sheet (blue); rates are computed from it.").font = Font(
+        name="Arial", size=9, italic=True, color="5B6570")
+    wb.save(path)
 
 
 if __name__ == "__main__":
