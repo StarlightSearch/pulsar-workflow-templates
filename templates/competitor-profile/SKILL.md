@@ -60,7 +60,7 @@ It saves each page's text as /tmp/comp/<name>/pages/*.md and prints what it fetc
 
 List candidate facts across all the sites, then read the pages to confirm them.
 
-Run `python3 /workspace/workflow/scripts/extract_facts.py /tmp/comp/*` (only the folders of competitors that were fetched). It prints, per competitor, every line that looks like a price, a trial or free plan, a scale claim, a founding year, a team size, a compliance or hosting claim, an integration count or open-source mention, each with its page URL.
+Run `python3 /workspace/workflow/scripts/extract_facts.py /tmp/comp/<name> /tmp/comp/<name> ...`, naming only the folders of competitors whose fetch succeeded (a failed fetch leaves an empty folder that would show up as a competitor with no pages). It prints, per competitor, every line that looks like a price, a trial or free plan, a scale claim, a founding year, a team size, a compliance or hosting claim, an integration count or open-source mention, each with its page URL.
 
 Treat these as leads: a dollar figure on a blog page is usually revenue, not a price. Then read every page's text yourself for what no pattern finds: the headline and subheadline, who the copy speaks to, the main capabilities, named customers, and what the changelog says they shipped (with its dates).
 
