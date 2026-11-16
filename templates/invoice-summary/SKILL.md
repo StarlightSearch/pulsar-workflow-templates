@@ -35,6 +35,8 @@ Turns one supplier invoice into the handful of facts someone needs to pay or fil
 
 Extract the invoice's text with its layout kept, so table columns stay lined up.
 
+Check the libraries first: run `python3 -c "import pypdf, reportlab"`; if it fails, run `pip install --quiet --user --break-system-packages pypdf reportlab`, check again, and if it still fails say which package is missing and stop.
+
 Run `python3 /workspace/workflow/scripts/extract_text.py <invoice> /tmp/invoice.txt` with the invoice path from /workspace/inputs/, then read /tmp/invoice.txt. The script prints the page count and whether the PDF looks scanned.
 
 - If it says `scanned: true`, the PDF is an image with no text layer. Do not guess the figures: write /workspace/out/output.json with every field null, `checks_passed: false` and `issues: ["The PDF is a scan with no text layer; it needs OCR first."]`, say so in the answer, and stop.

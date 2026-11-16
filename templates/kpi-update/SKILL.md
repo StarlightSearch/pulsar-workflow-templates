@@ -21,6 +21,8 @@ Turns a metrics export into the update someone would post on Monday morning: the
 
 Open the file and decide which columns are metrics, what one row covers, and how the metrics relate.
 
+Check the libraries first: run `python3 -c "import pandas, openpyxl, matplotlib"`; if it fails, run `pip install --quiet --user --break-system-packages pandas openpyxl matplotlib`, check again, and if it still fails say which package is missing and stop.
+
 Take the file path from /workspace/inputs/ and read the first rows with pandas. Decide:
 
 - **Metrics**: every numeric column, unless it is an id or a code. Leave out columns that are obviously not KPIs and say so.

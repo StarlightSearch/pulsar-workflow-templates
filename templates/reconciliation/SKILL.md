@@ -43,6 +43,8 @@ Does the month-end bank reconciliation: every bank line is matched to a ledger e
 
 Work out which file is the bank statement and which is the ledger, and the period they cover.
 
+Check the libraries first: run `python3 -c "import pandas, openpyxl"`; if it fails, run `pip install --quiet --user --break-system-packages pandas openpyxl`, check again, and if it still fails say which package is missing and stop.
+
 List /workspace/inputs/ and look at the first rows of each file with pandas (skip lines starting with `#`). The bank statement has bank-style descriptions and usually a running balance; the ledger has references, debit and credit columns, and often an opening balance row.
 
 - If the ledger holds several accounts, keep only the bank account (named like "Cash at bank", "Bank", or a 10xx code) in a copy under /tmp, and use that copy.
