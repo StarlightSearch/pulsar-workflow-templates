@@ -4,3 +4,4 @@ Copyright 2026 Starlight Search
 This product includes templates adapted from the sources below. One line per adapted source:
 
 - templates/invoice-summary: adapted from anthropics/skills, skills/pdf (https://github.com/anthropics/skills/tree/main/skills/pdf), Apache-2.0.
+- templates/meeting-notes: adapted from anthropics/skills, skills/docx (https://github.com/anthropics/skills/tree/main/skills/docx), Apache-2.0.
