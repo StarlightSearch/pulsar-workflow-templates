@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { fixture, REPO } from "./test-helpers";
+import { fixture } from "./test-helpers";
 import { validateTemplate } from "./validate";
 
 const read = (p: string) => readFileSync(p, "utf8");
@@ -13,8 +13,9 @@ function editJson(file: string, fn: (j: any) => void) {
 const has = (errs: string[], re: RegExp) => errs.some((e) => re.test(e));
 
 describe("validateTemplate", () => {
-  it("accepts hello-template", () => {
-    expect(validateTemplate(join(REPO, "templates", "hello-template"))).toEqual([]);
+  it("accepts the hello-template fixture", () => {
+    const [, dir] = fixture();
+    expect(validateTemplate(dir)).toEqual([]);
   });
 
   it("rejects slug != folder", () => {
