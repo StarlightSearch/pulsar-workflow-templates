@@ -38,7 +38,7 @@ Extract the invoice's text with its layout kept, so table columns stay lined up.
 Run `python3 /workspace/workflow/scripts/extract_text.py <invoice> /tmp/invoice.txt` with the invoice path from /workspace/inputs/, then read /tmp/invoice.txt. The script prints the page count and whether the PDF looks scanned.
 
 - If it says `scanned: true`, the PDF is an image with no text layer. Do not guess the figures: write /workspace/out/output.json with every field null, `checks_passed: false` and `issues: ["The PDF is a scan with no text layer; it needs OCR first."]`, say so in the answer, and stop.
-- If it reports `encrypted`, do the same with the issue "The PDF is password protected."
+- If it reports `encrypted` or `unreadable`, do the same, with its `detail` as the issue.
 
 ### 2. Find the fields
 
@@ -55,14 +55,14 @@ Use this shape (null for anything the invoice does not print):
   "due_date": "YYYY-MM-DD",
   "due_date_source": "printed | terms | missing",
   "payment_terms": "As printed, e.g. Net 30",
-  "currency": "EUR",
-  "line_items": [{"description": "...", "quantity": 2, "unit_price": 74.5, "amount": 149.0}],
-  "subtotal": 1314.0,
+  "currency": "GBP",
+  "line_items": [{"description": "...", "quantity": 3, "unit_price": 12.5, "amount": 37.5}],
+  "subtotal": 437.5,
   "discount": null,
-  "tax_label": "VAT 21%",
-  "tax": 275.94,
-  "total": 1589.94,
-  "amount_due": 1589.94,
+  "tax_label": "Tax label as printed",
+  "tax": 87.5,
+  "total": 525.0,
+  "amount_due": 525.0,
   "notes": []
 }
 ```
@@ -71,10 +71,10 @@ How to decide the judgement calls:
 
 - **Supplier** is the issuer (usually top left, beside the logo or the VAT number), never the bill-to party.
 - **Total**: when several totals appear, take the one that includes tax ("Total", "Invoice total", "Total incl. VAT"). If an amount already paid is shown, put what remains in `amount_due` and keep `total` as the invoice total.
-- **Dates**: write them as ISO dates. Read day-first (28/10/2026) unless the supplier is in the US or a day number above 12 settles it the other way; when both readings are possible, say which you chose in `notes`.
+- **Dates**: write them as ISO dates. Read day-first (14/03/2026 is 14 March) unless the supplier is in the US or a day number above 12 settles it the other way; when both readings are possible, say which you chose in `notes`.
 - **Due date**: if printed, use it (`printed`). If only terms are printed ("Net 14", "30 days", "due on receipt"), add them to the invoice date (`terms`; receipt means the invoice date). If neither is printed, use null (`missing`).
 - **Currency**: the ISO code. Map symbols as printed (EUR for the euro sign, GBP for the pound sign); a bare `$` is USD unless the address or the notes say another dollar.
-- **Numbers**: plain numbers, no thousands separators or symbols. A comma used as the decimal mark (1.589,94) becomes 1589.94.
+- **Numbers**: plain numbers, no thousands separators or symbols. A comma used as the decimal mark (2.345,60) becomes 2345.6.
 - Put anything a reader should know (a purchase order number, a late fee clause, an amount that differs from the notes) in `notes` as short sentences.
 
 ### 3. Check and write the results

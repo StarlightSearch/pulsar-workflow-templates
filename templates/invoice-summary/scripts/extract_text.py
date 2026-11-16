@@ -16,11 +16,19 @@ from pypdf import PdfReader
 
 
 def main(pdf: str, out: str) -> None:
-    reader = PdfReader(pdf)
+    try:
+        reader = PdfReader(pdf)
+    except Exception as e:  # not a PDF, or damaged beyond reading
+        print(json.dumps({"error": "unreadable", "detail": f"The file could not be read as a PDF ({type(e).__name__})."}))
+        sys.exit(2)
     if reader.is_encrypted:
+        # An empty user password opens PDFs that are only permission-protected.
+        # decrypt() returns 0 (NOT_DECRYPTED) when a real password is needed.
         try:
-            reader.decrypt("")
+            opened = reader.decrypt("")
         except Exception:
+            opened = 0
+        if not opened:
             print(json.dumps({"error": "encrypted", "detail": "The PDF is password protected."}))
             sys.exit(2)
     pages = len(reader.pages)
