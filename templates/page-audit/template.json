@@ -1,0 +1,12 @@
+{
+  "slug": "page-audit",
+  "title": "Page audit",
+  "category": "marketing",
+  "summary": "Audits one web page for search and for copy, and returns a prioritised list of fixes, each naming the exact element to change.",
+  "takes": "A public page URL",
+  "gives": "A prioritised SEO and copy audit",
+  "icon": "chart",
+  "source": { "name": "seo-audit", "repo": "coreyhaines31/marketingskills", "path": "skills/seo-audit", "license": "MIT" },
+  "needs": { "web": true, "connections": [], "secrets": [] },
+  "targets": ["workflows", "pulsar"]
+}

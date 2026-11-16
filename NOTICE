@@ -13,3 +13,4 @@ This product includes templates adapted from the sources below. One line per ada
 - templates/ticket-reply: adapted from anthropics/knowledge-work-plugins, customer-support/skills/ticket-triage and customer-support/skills/draft-response (https://github.com/anthropics/knowledge-work-plugins/tree/main/customer-support), Apache-2.0.
 - templates/prospect-brief: adapted from anthropics/knowledge-work-plugins, sales/skills/account-research and sales/skills/draft-outreach (https://github.com/anthropics/knowledge-work-plugins/tree/main/sales), Apache-2.0.
 - templates/prospect-brief: adapted from coreyhaines31/marketingskills, skills/cold-email (https://github.com/coreyhaines31/marketingskills/tree/main/skills/cold-email), MIT.
+- templates/page-audit: adapted from coreyhaines31/marketingskills, skills/seo-audit and skills/copywriting (https://github.com/coreyhaines31/marketingskills/tree/main/skills), MIT.

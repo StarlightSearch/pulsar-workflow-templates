@@ -1,0 +1,22 @@
+{
+  "evals": [
+    {
+      "prompt": "Audit https://ghost.org for SEO and copy.",
+      "files": [],
+      "expectations": [
+        "audit.md has Summary, Top 5 priorities, SEO and technical findings, Copy findings, What works and Not checked sections",
+        "audit.md lists at least 5 findings, each with a priority (high, medium or low), the page element it refers to and a fix",
+        "Each copy finding in audit.md quotes text from the page and gives a suggested rewrite, and no rewrite invents a statistic (missing facts are marked [NEED: ...])",
+        "output.json status is ok, the high, medium and low counts add up to the number of findings, and not_checked mentions Core Web Vitals"
+      ]
+    },
+    {
+      "prompt": "Audit https://launch-page-sample.example/pricing please.",
+      "files": [],
+      "expectations": [
+        "output.json status is fetch_failed with an empty findings list",
+        "The answer says the page could not be fetched and does not audit it from memory"
+      ]
+    }
+  ]
+}
