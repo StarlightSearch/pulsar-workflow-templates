@@ -139,16 +139,22 @@ def to_markdown(soup: BeautifulSoup) -> str:
 
 
 def is_challenge(body: bytes, soup: BeautifulSoup) -> bool:
-    """True for a bot-check page (Cloudflare and similar) served instead of the real page."""
+    """True for a bot-check page (Cloudflare and similar) served instead of the real page.
+
+    Cloudflare also injects /cdn-cgi/challenge-platform/ scripts into ordinary pages,
+    so that path alone means nothing; only a challenge title, or a challenge marker on
+    a page with almost no text, counts.
+    """
     title = clean(soup.title.get_text()).lower() if soup.title else ""
     if title.startswith("just a moment") or title.startswith("attention required") or "captcha" in title or title in ("access denied", "are you a robot?", "verify you are human"):
         return True
     head = body[:200000].lower()
-    if b"cf-chl" in head or b"challenge-platform" in head or b"cf_chl_opt" in head:
-        return True
-    # A page that is little more than a captcha (a contact form with reCAPTCHA is not).
-    text_words = len(re.findall(r"\w+", soup.get_text(" "))) if len(body) < 60000 else 1000
-    return b"captcha" in head and text_words < 150
+    if not (b"cf-chl" in head or b"cf_chl_opt" in head or b"captcha" in head):
+        return False
+    visible = BeautifulSoup(body, "html.parser")
+    for t in visible.find_all(["script", "style", "noscript", "template"]):
+        t.decompose()
+    return len(re.findall(r"\w+", visible.get_text(" "))) < 150
 
 
 def page_facts(url: str, res: dict, soup: BeautifulSoup) -> dict:
