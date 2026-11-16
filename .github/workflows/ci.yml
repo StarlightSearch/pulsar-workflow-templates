@@ -19,7 +19,7 @@ jobs:
 
   catalog:
     needs: check
-    if: github.event_name == 'push' && github.event.head_commit.message != 'chore: rebuild catalog'
+    if: "${{ github.event_name == 'push' && github.event.head_commit.message != 'chore: rebuild catalog' }}"
     runs-on: ubuntu-latest
     permissions:
       contents: write
