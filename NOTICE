@@ -8,3 +8,4 @@ This product includes templates adapted from the sources below. One line per ada
 - templates/kpi-update: adapted from anthropics/skills, skills/xlsx (https://github.com/anthropics/skills/tree/main/skills/xlsx), Apache-2.0.
 - templates/kpi-update: adapted from anthropics/knowledge-work-plugins, data/skills/analyze and data/skills/data-visualization (https://github.com/anthropics/knowledge-work-plugins/tree/main/data), Apache-2.0.
 - templates/reconciliation: adapted from anthropics/knowledge-work-plugins, finance/skills/reconciliation (https://github.com/anthropics/knowledge-work-plugins/tree/main/finance/skills/reconciliation), Apache-2.0.
+- templates/notes-to-slides: adapted from anthropics/skills, skills/pptx (https://github.com/anthropics/skills/tree/main/skills/pptx), Apache-2.0.
