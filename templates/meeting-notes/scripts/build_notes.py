@@ -5,7 +5,7 @@ Usage: python3 build_notes.py <notes.json> <out.docx>
 notes.json is written by the run (see SKILL.md, step 3). The layout is fixed
 here so every set of notes looks the same: title, meeting line, summary,
 decisions, an action table (action, owner, due), open questions, and parked
-topics. Also writes output.json (decisions, actions, open questions) beside
+topics. Also writes output.json (decisions, actions, open questions, parked) beside
 the document. Prints the counts it wrote.
 """
 import json
@@ -107,7 +107,8 @@ def main(src, out):
         doc.add_paragraph("Summary", style="Heading 1")
         para(doc, n["summary"])
 
-    decisions = n.get("decisions") or []
+    # Accept plain strings as well as objects, so a slightly different notes.json still builds.
+    decisions = [d if isinstance(d, dict) else {"decision": str(d)} for d in (n.get("decisions") or [])]
     doc.add_paragraph("Decisions", style="Heading 1")
     if decisions:
         for d in decisions:
@@ -118,7 +119,7 @@ def main(src, out):
     else:
         para(doc, "No decisions were made.", italic=True, color=MUTED)
 
-    actions = n.get("actions") or []
+    actions = [a if isinstance(a, dict) else {"action": str(a), "owner": None, "due": None} for a in (n.get("actions") or [])]
     doc.add_paragraph("Action items", style="Heading 1")
     unassigned = 0
     if actions:
@@ -160,7 +161,7 @@ def main(src, out):
     else:
         para(doc, "No action items.", italic=True, color=MUTED)
 
-    questions = n.get("open_questions") or []
+    questions = [q if isinstance(q, dict) else {"question": str(q)} for q in (n.get("open_questions") or [])]
     doc.add_paragraph("Open questions", style="Heading 1")
     if questions:
         for q in questions:
@@ -172,7 +173,8 @@ def main(src, out):
     else:
         para(doc, "None left open.", italic=True, color=MUTED)
 
-    parked = n.get("parked") or []
+    parked = [p if isinstance(p, str) else str(p.get("item") or p.get("text") or p.get("topic") or "") for p in (n.get("parked") or [])]
+    parked = [p for p in parked if p]
     if parked:
         doc.add_paragraph("Discussed, not agreed", style="Heading 1")
         for item in parked:
@@ -191,6 +193,7 @@ def main(src, out):
         "decisions": [d.get("decision", "") for d in decisions],
         "actions": [{"action": a.get("action", ""), "owner": a.get("owner"), "due": a.get("due")} for a in actions],
         "open_questions": [q.get("question", "") for q in questions],
+        "parked": parked,
     }
     with open(os.path.join(os.path.dirname(os.path.abspath(out)), "output.json"), "w", encoding="utf-8") as f:
         json.dump(result, f, indent=2)
