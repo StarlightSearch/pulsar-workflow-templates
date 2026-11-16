@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "commit": "4c15d68f15c11f9170d2d3bb5b5379190f2b4913",
-  "builtAt": "2026-11-16T15:12:12.721Z",
+  "commit": "8b9cd9babb4bb433c085d0f032b29f031f7fe823",
+  "builtAt": "2026-11-16T18:11:20.678Z",
   "categories": [
     {
       "id": "documents",
@@ -41,13 +41,19 @@
   ],
   "templates": [
     {
-      "slug": "hello-template",
-      "title": "Hello template",
+      "slug": "invoice-summary",
+      "title": "Invoice summary",
       "category": "documents",
-      "summary": "A tiny fixture template: a text file in, a greeting summary out.",
-      "takes": "One text file",
-      "gives": "A short greeting summary",
+      "summary": "Reads an invoice PDF, pulls out the supplier, total and due date, checks the sums, and writes a one-page summary.",
+      "takes": "One invoice PDF",
+      "gives": "Key fields as JSON, checked sums, a summary PDF",
       "icon": "doc",
+      "source": {
+        "name": "pdf",
+        "repo": "anthropics/skills",
+        "path": "skills/pdf",
+        "license": "Apache-2.0"
+      },
       "needs": {
         "web": false,
         "connections": [],
@@ -58,24 +64,566 @@
         "pulsar"
       ],
       "steps": [
-        "Read the file",
-        "Write the summary"
+        "Read the invoice",
+        "Find the fields",
+        "Check and write the results",
+        "Answer"
       ],
       "files": [
         {
           "path": "SKILL.md",
-          "size": 462,
-          "sha256": "8944b477a0f520d191a00814180a3e68665d07ee8f37165823cf04ed497bc720"
+          "size": 6489,
+          "sha256": "31b78a16a100d720de3f67564d12e10b10497e97734c20dc9033246553e938d4"
         },
         {
           "path": "evals/evals.json",
-          "size": 215,
-          "sha256": "064e4e1f2b8996d9b68b4953b941713be68139b85e6d74cad1708e553c7563d4"
+          "size": 908,
+          "sha256": "905e6b35b3651b5c426518e5cfa082876bb37f72c47319221e5a4c27f6a3571c"
         },
         {
-          "path": "samples/hello.txt",
-          "size": 28,
-          "sha256": "9a0da2380eaa6c9d2985342e0b3d2beccc5add47ab09bcb17a8b74cb82a45b57"
+          "path": "samples/invoice-no-due-date.pdf",
+          "size": 2744,
+          "sha256": "7f5c62b08ce84e0f99471d2b5403d14287862bf553aa031c4b23330ed84e6d73"
+        },
+        {
+          "path": "samples/invoice.pdf",
+          "size": 3011,
+          "sha256": "944c64810819f5f7f938a07fa35561224093b52db975b1d1589bf0ee09b3c33f"
+        },
+        {
+          "path": "scripts/extract_text.py",
+          "size": 1993,
+          "sha256": "a58721e269acd4e240de6dc658d45a8de3df52e7259510c88e64fbded9bf06e9"
+        },
+        {
+          "path": "scripts/summarise.py",
+          "size": 9025,
+          "sha256": "7b6f1f188335ccc40b47acaf9686cfcf2c0d9303efb9c3ebbd1f0f154372dfad"
+        }
+      ]
+    },
+    {
+      "slug": "meeting-notes",
+      "title": "Meeting notes",
+      "category": "documents",
+      "summary": "Turns a meeting transcript into a Word document with the decisions, action items with owners and due dates, and open questions.",
+      "takes": "A meeting transcript",
+      "gives": "Notes as a Word document, actions as JSON",
+      "icon": "mic",
+      "source": {
+        "name": "docx",
+        "repo": "anthropics/skills",
+        "path": "skills/docx",
+        "license": "Apache-2.0"
+      },
+      "needs": {
+        "web": false,
+        "connections": [],
+        "secrets": []
+      },
+      "targets": [
+        "workflows",
+        "pulsar"
+      ],
+      "steps": [
+        "Read the transcript",
+        "Find decisions, actions, questions",
+        "Write the notes",
+        "Answer"
+      ],
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 6041,
+          "sha256": "2454a992d2a45e69d2005ab6cffc152f020ab4dd236a19cfd724d57d35c5c988"
+        },
+        {
+          "path": "evals/evals.json",
+          "size": 1107,
+          "sha256": "27ce3c0b065e269628151810abd13b7b139c40bd31178d6a55453bee7c69c3d1"
+        },
+        {
+          "path": "samples/standup.txt",
+          "size": 999,
+          "sha256": "da4870872bb39e16d2418bd3ea7c01a97dfb120771f2e976623e1cf6d8db1c0a"
+        },
+        {
+          "path": "samples/transcript.txt",
+          "size": 3559,
+          "sha256": "3a35a8bae299adfd111eac9c5ed68036675b8a0eedb94196c85474763aa7aa05"
+        },
+        {
+          "path": "scripts/build_notes.py",
+          "size": 7955,
+          "sha256": "dfa439122afa9c92093ba7914330a541e0caa290b971ec89c14e12fc114cd114"
+        }
+      ]
+    },
+    {
+      "slug": "reconciliation",
+      "title": "Bank reconciliation",
+      "category": "finance-data",
+      "summary": "Matches a bank statement against the ledger's cash account, explains every difference, and proposes the journal entries to fix them.",
+      "takes": "A bank statement and a ledger export",
+      "gives": "A reconciliation workbook and an exceptions list",
+      "icon": "table",
+      "source": {
+        "name": "reconciliation",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "finance/skills/reconciliation",
+        "license": "Apache-2.0"
+      },
+      "needs": {
+        "web": false,
+        "connections": [],
+        "secrets": []
+      },
+      "targets": [
+        "workflows",
+        "pulsar"
+      ],
+      "steps": [
+        "Identify the files",
+        "Match the transactions",
+        "Review the exceptions",
+        "Write the exceptions list",
+        "Answer"
+      ],
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 8208,
+          "sha256": "64582070ede33286a7a882e48db0fd0178c4928acdacb3edb1beebef68ce4aa4"
+        },
+        {
+          "path": "evals/evals.json",
+          "size": 757,
+          "sha256": "037130a919af39d2addec6d15b494cdbcaafd4a5169ce8f53bb1049d9a53f75c"
+        },
+        {
+          "path": "samples/ledger.xlsx",
+          "size": 6288,
+          "sha256": "59044812bec52f2358c31c5a2ddcf10cce05e64a2c5fd9e8d265ae7981b345f7"
+        },
+        {
+          "path": "samples/statement.csv",
+          "size": 1247,
+          "sha256": "088987986b1a8a2e9b9a406ed558981c0c390339a5edbc35c73ac467e399ea00"
+        },
+        {
+          "path": "scripts/reconcile.py",
+          "size": 22300,
+          "sha256": "d128244f2074be20c86373a562a076dc36fea82940f5ef4ab5c25e7e89eb41b1"
+        }
+      ]
+    },
+    {
+      "slug": "kpi-update",
+      "title": "KPI update",
+      "category": "finance-data",
+      "summary": "Turns a weekly or monthly metrics export into a short update: what changed, what moved and the likely driver, with a chart and a workbook.",
+      "takes": "A metrics CSV or Excel file",
+      "gives": "A written update, a chart and a workbook",
+      "icon": "chart",
+      "source": {
+        "name": "xlsx",
+        "repo": "anthropics/skills",
+        "path": "skills/xlsx",
+        "license": "Apache-2.0"
+      },
+      "needs": {
+        "web": false,
+        "connections": [],
+        "secrets": []
+      },
+      "targets": [
+        "workflows",
+        "pulsar"
+      ],
+      "steps": [
+        "Look at the data",
+        "Compute the numbers",
+        "Explain what moved",
+        "Write the update",
+        "Answer"
+      ],
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 7599,
+          "sha256": "309f0ae3480fb0bb43096be73a2d0a31222232ebeb0c3db05d3273f093574b53"
+        },
+        {
+          "path": "evals/evals.json",
+          "size": 669,
+          "sha256": "2654e12ed98dd09e814ffaf49f244012edc5f3358ca691049886e68147d3cb97"
+        },
+        {
+          "path": "samples/metrics.csv",
+          "size": 678,
+          "sha256": "b6cd50665e47df2d46b0bf0621c9d62407c54daacb08b0ceb4b7205f7ef68444"
+        },
+        {
+          "path": "scripts/analyse.py",
+          "size": 13389,
+          "sha256": "c425eef44442027521293d39443f8546b05e494576a738043354ca9b1783ece6"
+        }
+      ]
+    },
+    {
+      "slug": "contract-review",
+      "title": "Contract review",
+      "category": "legal",
+      "summary": "Reviews a contract against your checklist (or a sensible default), rates each clause red, yellow or green, and proposes redlines.",
+      "takes": "A contract PDF or Word file, plus your checklist",
+      "gives": "An issues report in Word with clause references",
+      "icon": "scale",
+      "source": {
+        "name": "review-contract",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "legal/skills/review-contract",
+        "license": "Apache-2.0"
+      },
+      "needs": {
+        "web": false,
+        "connections": [],
+        "secrets": []
+      },
+      "targets": [
+        "workflows",
+        "pulsar"
+      ],
+      "steps": [
+        "Read the contract",
+        "Set the basis",
+        "Review clause by clause",
+        "Build the report",
+        "Answer"
+      ],
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 9764,
+          "sha256": "8fd08c6f7e9f34bb2b61cd09c72966905586186d2780ff5378948468ef877bd0"
+        },
+        {
+          "path": "evals/evals.json",
+          "size": 1968,
+          "sha256": "c7e6f772914ba5b32f1a371dcebe60fadf12bad5365b44a845f285c9e43c71f7"
+        },
+        {
+          "path": "references/default-checklist.md",
+          "size": 3175,
+          "sha256": "ff706ba531b6d5dd6ca75cf986c0456181250786746bc5fbe47c67bbf953e9ab"
+        },
+        {
+          "path": "samples/contract.docx",
+          "size": 39927,
+          "sha256": "a389b40355d6da9ad8ef7c886e0a3e5be7a0b63bce220c6926183359143e6000"
+        },
+        {
+          "path": "samples/contract.pdf",
+          "size": 8504,
+          "sha256": "23cea297491b8677ecdcbecf6ba24ffb2666ab9554394852f02a1f718eb488f9"
+        },
+        {
+          "path": "scripts/build_report.py",
+          "size": 8857,
+          "sha256": "7394512f185a181eae28a07a6aa1542abb78113373fc7305a66d1dbe4f23e7cc"
+        },
+        {
+          "path": "scripts/extract_text.py",
+          "size": 8505,
+          "sha256": "a59138169b2d070c2d685bb6a0c1a5765b3845dcefe331d2409e16962c157e4f"
+        }
+      ]
+    },
+    {
+      "slug": "prospect-brief",
+      "title": "Prospect brief",
+      "category": "sales",
+      "summary": "Researches a prospect from its own website: a sourced brief with signals, fit and outreach hooks, plus a short first email that uses them.",
+      "takes": "A company website and a line on what you sell",
+      "gives": "A sourced brief and a first email draft",
+      "icon": "search",
+      "source": {
+        "name": "account-research",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "sales/skills/account-research",
+        "license": "Apache-2.0"
+      },
+      "needs": {
+        "web": true,
+        "connections": [],
+        "secrets": []
+      },
+      "targets": [
+        "workflows",
+        "pulsar"
+      ],
+      "steps": [
+        "Fetch the company's site",
+        "Read and take notes",
+        "Judge the fit",
+        "Write the brief",
+        "Draft the first email",
+        "Write the results and answer"
+      ],
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 10095,
+          "sha256": "5a295b27aabb7a56d1bfb36d607c5d214f555d09805f0c85f42920ce7e269f0f"
+        },
+        {
+          "path": "evals/evals.json",
+          "size": 1415,
+          "sha256": "0e9afb93a1c6a259fe3b6adf2d673be3f91f7587a3fb03a131c05a2be96a02d9"
+        },
+        {
+          "path": "scripts/check_email.py",
+          "size": 5090,
+          "sha256": "2bae56f588c926bc02eb17944560eb93d935693c6eff23e6bee84e47842a9dd1"
+        },
+        {
+          "path": "scripts/fetch_site.py",
+          "size": 19232,
+          "sha256": "31289a25ff2395f94bc99c628670077aadd3b78cdd832c6f8bf595f3aa813a3d"
+        }
+      ]
+    },
+    {
+      "slug": "competitor-profile",
+      "title": "Competitor profile",
+      "category": "marketing",
+      "summary": "Profiles two to five competitors from their websites: positioning, product, pricing and proof, compared side by side in one dated, sourced document.",
+      "takes": "Two to five competitor website URLs",
+      "gives": "A dated, sourced profile with a comparison",
+      "icon": "search",
+      "source": {
+        "name": "competitor-profiling",
+        "repo": "coreyhaines31/marketingskills",
+        "path": "skills/competitor-profiling",
+        "license": "MIT"
+      },
+      "needs": {
+        "web": true,
+        "connections": [],
+        "secrets": []
+      },
+      "targets": [
+        "workflows",
+        "pulsar"
+      ],
+      "steps": [
+        "Fetch each site",
+        "Gather the facts",
+        "Write each profile",
+        "Compare",
+        "Write the document and the results",
+        "Answer"
+      ],
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 9673,
+          "sha256": "abf61970c221d5a88fa838f9de92255a2b92efaf680cad344f98e8a1706eebe8"
+        },
+        {
+          "path": "evals/evals.json",
+          "size": 1355,
+          "sha256": "50763b4cb9e096349b14a6ef2d1304933995da82050e58fd5f1c71e4a157adbd"
+        },
+        {
+          "path": "scripts/extract_facts.py",
+          "size": 3342,
+          "sha256": "749142e61c317c585e1c9e2230df474b43848b67de418d5a3c5bb45f59a997f7"
+        },
+        {
+          "path": "scripts/fetch_site.py",
+          "size": 19232,
+          "sha256": "31289a25ff2395f94bc99c628670077aadd3b78cdd832c6f8bf595f3aa813a3d"
+        }
+      ]
+    },
+    {
+      "slug": "page-audit",
+      "title": "Page audit",
+      "category": "marketing",
+      "summary": "Audits one web page for search and for copy, and returns a prioritised list of fixes, each naming the exact element to change.",
+      "takes": "A public page URL",
+      "gives": "A prioritised SEO and copy audit",
+      "icon": "chart",
+      "source": {
+        "name": "seo-audit",
+        "repo": "coreyhaines31/marketingskills",
+        "path": "skills/seo-audit",
+        "license": "MIT"
+      },
+      "needs": {
+        "web": true,
+        "connections": [],
+        "secrets": []
+      },
+      "targets": [
+        "workflows",
+        "pulsar"
+      ],
+      "steps": [
+        "Fetch the page",
+        "Run the SEO checks",
+        "Review the copy",
+        "Prioritise",
+        "Write the audit",
+        "Answer"
+      ],
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 9235,
+          "sha256": "f918f45f28d8f8c774745da5c5a652d5d4a8ed8ebb0fd0ec55003487ca9f9243"
+        },
+        {
+          "path": "evals/evals.json",
+          "size": 1025,
+          "sha256": "cbaa407fdbbbeec5fbf35a7a305b339c32d6081f9d24d097514ec758da6d6076"
+        },
+        {
+          "path": "scripts/audit_checks.py",
+          "size": 9273,
+          "sha256": "85f187e7e7c23a3b21f18b07a053f35c63cb0b28c5f79e19241f82a0aa08f342"
+        },
+        {
+          "path": "scripts/fetch_site.py",
+          "size": 19232,
+          "sha256": "31289a25ff2395f94bc99c628670077aadd3b78cdd832c6f8bf595f3aa813a3d"
+        }
+      ]
+    },
+    {
+      "slug": "ticket-reply",
+      "title": "Ticket reply",
+      "category": "support",
+      "summary": "Triages a support ticket (category, priority, team) and drafts a reply grounded only in your help articles, citing what it used.",
+      "takes": "A customer ticket and your help articles",
+      "gives": "Triage as JSON and a reply draft",
+      "icon": "mail",
+      "source": {
+        "name": "customer-support",
+        "repo": "anthropics/knowledge-work-plugins",
+        "path": "customer-support/skills",
+        "license": "Apache-2.0"
+      },
+      "needs": {
+        "web": false,
+        "connections": [],
+        "secrets": []
+      },
+      "targets": [
+        "workflows",
+        "pulsar"
+      ],
+      "steps": [
+        "Read the ticket",
+        "Search the help articles",
+        "Triage",
+        "Draft the reply",
+        "Check and write the triage",
+        "Answer"
+      ],
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 8970,
+          "sha256": "2401b2cb382679f76d8661f8d6d3305c5d6503b385d735df35b1d2ce38fa481a"
+        },
+        {
+          "path": "evals/evals.json",
+          "size": 2212,
+          "sha256": "67f8413e8aefc5151b41c8938d9f57eccdc301ca1b4f9e81d154b85fa047eabb"
+        },
+        {
+          "path": "samples/help/changing-plans.md",
+          "size": 829,
+          "sha256": "f2c49e66990288223ccaa6137230e3c457707fc0f8300e4ec3665c12f4c8bb55"
+        },
+        {
+          "path": "samples/help/duplicate-charges.md",
+          "size": 1519,
+          "sha256": "5124e10059f435aadb4d907067e9f0f96ddf6054d1e46de9461ab325c9cc81c6"
+        },
+        {
+          "path": "samples/help/invoices-and-receipts.md",
+          "size": 854,
+          "sha256": "8f3e3a6f5c9efce8fb77f83ebf5a447c5b42876c93e962230b975c1d8e57a640"
+        },
+        {
+          "path": "samples/help/timesheet-export.md",
+          "size": 603,
+          "sha256": "ceb3fccf69a53086a7a9c8cc1df6165d8262e5d97e17caa8973d7ebeb1fb4650"
+        },
+        {
+          "path": "scripts/check_reply.py",
+          "size": 5015,
+          "sha256": "3a0c8dc34e72a73a8a40cc21a5e12732c62554d552abb90220a48bcf44631808"
+        },
+        {
+          "path": "scripts/search_help.py",
+          "size": 5409,
+          "sha256": "d4b8bf719fa063ee855778855a0c19e30e537ef9d12e4e78274ac240324ddb63"
+        }
+      ]
+    },
+    {
+      "slug": "notes-to-slides",
+      "title": "Notes to slides",
+      "category": "presentations",
+      "summary": "Turns rough meeting notes into a designed PowerPoint deck with a clear storyline, big numbers, a chart and speaker notes.",
+      "takes": "Notes as Markdown or text",
+      "gives": "A PowerPoint deck with speaker notes",
+      "icon": "slides",
+      "source": {
+        "name": "pptx",
+        "repo": "anthropics/skills",
+        "path": "skills/pptx",
+        "license": "Apache-2.0"
+      },
+      "needs": {
+        "web": false,
+        "connections": [],
+        "secrets": []
+      },
+      "targets": [
+        "workflows",
+        "pulsar"
+      ],
+      "steps": [
+        "Check the slide library",
+        "Plan the storyline",
+        "Write the slide plan",
+        "Build and check the deck",
+        "Answer"
+      ],
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 6420,
+          "sha256": "486175a3f8ec0d8266d7f9f27d27630beff590fcc445786c7b1558f28321eb45"
+        },
+        {
+          "path": "evals/evals.json",
+          "size": 665,
+          "sha256": "0c15dec291cc4203d229dbafa049c9034e4fc297b8a8b5837bc3c26bc8c2616e"
+        },
+        {
+          "path": "samples/notes.md",
+          "size": 2249,
+          "sha256": "49b5ab7467f1936bce8e2b53c33fd6b5ca4e52eedeb74ad6eab448c618f1af95"
+        },
+        {
+          "path": "scripts/build_deck.py",
+          "size": 17817,
+          "sha256": "b8da9fa4ab1ea131c0d8646e1bca71fdbbd52d0bd6b921e31ebf3ea917d32fa3"
         }
       ]
     }
