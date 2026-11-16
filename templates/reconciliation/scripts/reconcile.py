@@ -71,7 +71,7 @@ def to_num(v):
         return None
     if isinstance(v, (int, float)):
         return float(v)
-    s = str(v).strip().replace(" ", "").replace(" ", "")
+    s = str(v).strip().replace("\xa0", "").replace(" ", "")
     if not s or s in ("-", "nan"):
         return None
     neg = s.startswith("(") and s.endswith(")") or s.endswith("-")
