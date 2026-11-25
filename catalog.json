@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "commit": "8b9cd9babb4bb433c085d0f032b29f031f7fe823",
-  "builtAt": "2026-11-16T18:11:20.678Z",
+  "commit": "92f0d6fa47b59a742d5e402901913e00cd3f277d",
+  "builtAt": "2026-11-25T17:26:12.747Z",
   "categories": [
     {
       "id": "documents",
@@ -37,6 +37,16 @@
       "id": "presentations",
       "title": "Presentations",
       "order": 7
+    },
+    {
+      "id": "engineering",
+      "title": "Engineering",
+      "order": 8
+    },
+    {
+      "id": "media",
+      "title": "Media",
+      "order": 9
     }
   ],
   "templates": [
@@ -624,6 +634,116 @@
           "path": "scripts/build_deck.py",
           "size": 17817,
           "sha256": "b8da9fa4ab1ea131c0d8646e1bca71fdbbd52d0bd6b921e31ebf3ea917d32fa3"
+        }
+      ]
+    },
+    {
+      "slug": "drawing-to-3d-model",
+      "title": "Drawing to 3D model",
+      "category": "engineering",
+      "summary": "Reads a mechanical drawing and builds the part as a 3D model, checks every dimension against the drawing, and lists what it assumed or left out.",
+      "takes": "One drawing (PDF or image)",
+      "gives": "STEP and STL files, a views preview, a dimension check table",
+      "icon": "scale",
+      "needs": {
+        "web": false,
+        "connections": [],
+        "secrets": []
+      },
+      "targets": [
+        "workflows"
+      ],
+      "steps": [
+        "Read the drawing",
+        "Set up the CAD tools",
+        "Build the model",
+        "Check against the drawing",
+        "Publish the model"
+      ],
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 18416,
+          "sha256": "a9ad10198a61be6956598eab50b3e73934e83cf7fe45a2dfe17453af456d7e02"
+        },
+        {
+          "path": "evals/evals.json",
+          "size": 574,
+          "sha256": "3cc5fee9f326fc9fff75a67b4b923fc30dee44f7f3c3810fe59b544a0cd9b7a4"
+        },
+        {
+          "path": "samples/stepped-pin.pdf",
+          "size": 26179,
+          "sha256": "9b4007c880fca66cee2458f6423e07d45272f2f0dd98362b95a6c68de5f970fb"
+        },
+        {
+          "path": "scripts/cadkit.py",
+          "size": 19836,
+          "sha256": "e514c52bec3c771152e504756a1f629b870540f05f7b31e63fe3fd0493616bc3"
+        },
+        {
+          "path": "scripts/check_model.py",
+          "size": 6279,
+          "sha256": "c32af34d9d8d3aab203af7d293fbf798aa7e023764953f2efe7796123f336954"
+        },
+        {
+          "path": "scripts/measure.py",
+          "size": 8483,
+          "sha256": "9c3a16a8aef04440a37a0ab7619defcfbd908559e3fe1dd759feac4d61168e20"
+        },
+        {
+          "path": "scripts/render_drawing.py",
+          "size": 4055,
+          "sha256": "3317d303b2a8173961ba9ce6660131085d9a2e3a64dd3329eee7c06ba7643dcb"
+        },
+        {
+          "path": "scripts/render_views.py",
+          "size": 7236,
+          "sha256": "94f72931e5d2cdf9f4803d12d5eec123a1b62c3dc4a36e8182322e90ec7e1600"
+        },
+        {
+          "path": "scripts/setup-cad.sh",
+          "size": 1048,
+          "sha256": "faee6dde3412a34fa6d32c6b86451e9e9291edf03738998caad40c4ea9b9f39c"
+        }
+      ]
+    },
+    {
+      "slug": "topic-to-video",
+      "title": "Topic to video",
+      "category": "media",
+      "summary": "Turns any topic into a 10-second explainer video with animated titles, bullet points, a statistic and a chart, ready to post.",
+      "takes": "A topic, in a word or a sentence",
+      "gives": "A 10-second MP4 and a poster image",
+      "icon": "slides",
+      "needs": {
+        "web": false,
+        "connections": [],
+        "secrets": []
+      },
+      "targets": [
+        "workflows"
+      ],
+      "steps": [
+        "Plan the scenes",
+        "Render",
+        "Report"
+      ],
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 4590,
+          "sha256": "501fe4176f32029ef69bd3588c6f2fc11f95be5130afbc53fbe9133d9d49ed57"
+        },
+        {
+          "path": "evals/evals.json",
+          "size": 740,
+          "sha256": "889475357c06a195118948c939a3731a34fafd112fa8499f4e99cdfc5595f70e"
+        },
+        {
+          "path": "scripts/render_video.py",
+          "size": 16641,
+          "sha256": "69e4c299671dfa6d0dbaeb08dc0fbc4ba21c47941b810cf49e7cc19cac0ba192"
         }
       ]
     }
