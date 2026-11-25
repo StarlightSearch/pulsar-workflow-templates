@@ -5,5 +5,7 @@
   { "id": "sales", "title": "Sales", "order": 4 },
   { "id": "marketing", "title": "Marketing", "order": 5 },
   { "id": "support", "title": "Support", "order": 6 },
-  { "id": "presentations", "title": "Presentations", "order": 7 }
+  { "id": "presentations", "title": "Presentations", "order": 7 },
+  { "id": "engineering", "title": "Engineering", "order": 8 },
+  { "id": "media", "title": "Media", "order": 9 }
 ]
