@@ -1,0 +1,14 @@
+{
+  "evals": [
+    {
+      "prompt": "Model the part on the attached drawing.",
+      "files": ["samples/stepped-pin.pdf"],
+      "expectations": [
+        "output.json status is complete or approximate, part_name is STEPPED PIN and drawing_number is SP-1001",
+        "output.json size_mm is 40 x 20 x 20 within 0.05 mm",
+        "The checks include the Ø20 body, the Ø12 spigot, the 25 shoulder position and the Ø6 cross hole at 12.5, each ok",
+        "/workspace/out has a .step, a .stl and a -views.png file and nothing else besides output.json"
+      ]
+    }
+  ]
+}

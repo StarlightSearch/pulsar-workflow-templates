@@ -1,0 +1,11 @@
+{
+  "slug": "drawing-to-3d-model",
+  "title": "Drawing to 3D model",
+  "category": "engineering",
+  "summary": "Reads a mechanical drawing and builds the part as a 3D model, checks every dimension against the drawing, and lists what it assumed or left out.",
+  "takes": "One drawing (PDF or image)",
+  "gives": "STEP and STL files, a views preview, a dimension check table",
+  "icon": "scale",
+  "needs": { "web": false, "connections": [], "secrets": [] },
+  "targets": ["workflows"]
+}
