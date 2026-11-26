@@ -7,8 +7,9 @@ to an MP4 by seeking the timeline frame by frame in headless Chromium.
 
 --check seeks through the whole video and reports, with the time each starts:
 script errors, text that leaves the frame or overflows its box, text that
-overlaps other text, icons whose name does not exist, and a length outside
-8 to 12.5 s. It also writes stills.png (a contact sheet of 8 frames) next to
+overlaps other text, icons whose name does not exist, a scene whose figure stays
+small (under an eighth of the frame; the closing scene is exempt), and a length
+outside 8 to 12.5 s. It also writes stills.png (a contact sheet of 8 frames) next to
 the page. Fix everything it reports, then render.
 
 Needs Playwright for Python and its Chromium (scripts/setup_browser.sh sets
@@ -31,7 +32,7 @@ W, H, FPS = 1280, 720, 30
 LINT_JS = r"""
 () => {
   const stage = document.getElementById('stage');
-  if (!stage) return [{kind: 'no_stage', text: 'the page has no #stage element'}];
+  if (!stage) return {problems: [{kind: 'no_stage', text: 'the page has no #stage element'}], sizes: []};
   const sb = stage.getBoundingClientRect();
   const out = [];
   const shown = (el) => {
@@ -65,6 +66,37 @@ LINT_JS = r"""
       out.push({kind: 'overflows_box', text: label});
     texts.push({el, r, label});
   }
+  // The figure: the box around every visible graphic of a scene (SVGs, icons, images, and
+  // shapes drawn with CSS: boxes with a fill or a border and no text of their own), leaving
+  // out anything that covers most of the frame (backgrounds, wipes, grain).
+  const painted = (el) => {
+    const cs = getComputedStyle(el);
+    const fill = cs.backgroundImage !== 'none' || !/rgba\(0, 0, 0, 0\)|transparent/.test(cs.backgroundColor);
+    return fill || (parseFloat(cs.borderTopWidth) > 0 && !/rgba\(0, 0, 0, 0\)/.test(cs.borderTopColor));
+  };
+  const figs = new Map();
+  for (const sc of stage.querySelectorAll('.scene')) {
+    for (const el of sc.querySelectorAll('*')) {
+      if (el.parentElement.closest('svg')) continue;
+      const tag = el.tagName.toLowerCase();
+      const own = [...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim());
+      const graphic = tag === 'svg' || tag === 'img' || tag === 'canvas' || el.classList.contains('ph') ||
+                      el.classList.contains('fig') || (!own && painted(el));
+      if (!graphic || !shown(el)) continue;
+      const r = el.getBoundingClientRect();
+      if (r.width < 4 || r.height < 4 || r.width * r.height > 0.6 * sb.width * sb.height) continue;
+      const b = figs.get(sc) || {l: 1e9, t: 1e9, r: -1e9, b: -1e9};
+      figs.set(sc, {l: Math.min(b.l, r.left), t: Math.min(b.t, r.top), r: Math.max(b.r, r.right), b: Math.max(b.b, r.bottom)});
+    }
+  }
+  const sizes = [];
+  const scenes = [...stage.querySelectorAll('.scene')];
+  for (const sc of new Set(texts.map(x => x.el.closest('.scene')).filter(Boolean))) {
+    const b = figs.get(sc);
+    const area = b ? Math.max(0, Math.min(b.r, sb.right) - Math.max(b.l, sb.left)) * Math.max(0, Math.min(b.b, sb.bottom) - Math.max(b.t, sb.top)) : 0;
+    sizes.push({scene: sc.id || ('scene ' + (scenes.indexOf(sc) + 1)), pct: 100 * area / (sb.width * sb.height),
+                last: sc === scenes[scenes.length - 1]});
+  }
   for (let i = 0; i < texts.length; i++) for (let j = i + 1; j < texts.length; j++) {
     const a = texts[i], b = texts[j];
     if (a.el.contains(b.el) || b.el.contains(a.el)) continue;
@@ -75,7 +107,7 @@ LINT_JS = r"""
     const small = Math.min(a.r.width * a.r.height, b.r.width * b.r.height);
     if (ix * iy > 0.15 * small) out.push({kind: 'text_overlap', text: a.label + ' / ' + b.label});
   }
-  return out;
+  return {problems: out, sizes};
 }
 """
 
@@ -130,15 +162,31 @@ def check(page_path: str) -> dict:
             problems[("length", f"the timeline is {duration:.2f} s; make it 8 to 12.5 s")] = 0.0
         # A problem counts once it lasts two samples in a row (0.25 s apart): text still moving
         # into place may cross something for a moment. An unknown icon counts at once.
-        t, last = 0.0, set()
+        t, last, streak = 0.0, set(), {}
+        biggest: dict[str, tuple] = {}  # scene -> (largest figure share seen, first seen at, is last scene)
         while t <= duration + 1e-6:
             seek(page, t)
-            now = {(pr["kind"], pr["text"]) for pr in page.evaluate(LINT_JS)}
-            for key in now:
-                if key in last or key[0] == "unknown_icon":
-                    problems.setdefault(key, round(t - (0.25 if key in last else 0), 2))
+            found = page.evaluate(LINT_JS)
+            now = set()
+            for pr in found["problems"]:
+                key = (pr["kind"], pr["text"])
+                now.add(key)
+                streak[key] = streak.get(key, 0) + 1 if key in last else 1
+                need = 1 if key[0] == "unknown_icon" else 2
+                if streak[key] >= need and key not in problems:
+                    problems[key] = round(t - 0.25 * (need - 1), 2)
             last = now
+            for sz in found["sizes"]:
+                prev = biggest.get(sz["scene"])
+                biggest[sz["scene"]] = (max(sz["pct"], prev[0] if prev else 0), prev[1] if prev else round(t, 2), sz["last"])
             t += 0.25
+        # The figure is the scene: one that never grows past an eighth of the frame (about
+        # 340 x 340 px) reads as words with a decoration. The closing scene may be type alone.
+        for scene, (pct, at, is_last) in biggest.items():
+            if pct < 12.5 and not is_last:
+                key = ("small_figure", f"{scene}: the figure never covers more than {pct:.0f}% of the frame; "
+                                       "make it cover at least an eighth (about 340 x 340 px), better a quarter")
+                problems[key] = at
         # Stills: 8 frames across the video, two rows of four.
         shots = []
         for k in range(8):

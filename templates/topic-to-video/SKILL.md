@@ -61,7 +61,7 @@ Read `/workspace/workflow/assets/example.html` in full first: it is a finished 1
 - **Colour**: set the five `:root` colours to suit the topic (dark backgrounds suit tech and science, warm ones food and people, a light paper one history and business), or to the colours the style asks for. Text must stay readable on its background.
 - **Icons**: `<i class="ph ph-NAME"></i>`, sized with `font-size`. Find names with `grep -i coffee /workspace/workflow/assets/icon-names.txt`. When no icon fits (the set has no bee, for example), draw the thing with SVG shapes, as the example does.
 - **Motion**: every element enters with motion (rise, scale with a little overshoot, draw a stroke, count up, travel along a path), staggered rather than all at once; something keeps moving while a scene holds (a slow zoom, a drifting background, a bobbing node). Change scenes with a slide, a wipe or a circle reveal, never a plain cut. Hold the last frame about a second.
-- **Layout**: keep text at least 40 px from the edges, nothing smaller than 22 px, figures large (most of the frame). Use only Geist (`font-family: Geist`, weights 500, 700, 900).
+- **Layout**: the figure is the biggest thing in every scene: at least a quarter of the frame (for example 640 x 400 px), with the headline beside or above it, not a small drawing next to a block of text. Use the whole height of the frame. Keep text at least 40 px from the edges and nothing smaller than 22 px. Use only Geist (`font-family: Geist`, weights 500, 700, 900).
 - **Only the timeline moves things.** No CSS transitions or animations, `setTimeout`, `requestAnimationFrame` or `Date.now()`: the recorder seeks the timeline frame by frame and sees nothing else. Load nothing from the web: no images, fonts or scripts other than the files in /tmp/video.
 
 ### 4. Check
@@ -71,7 +71,7 @@ Read `/workspace/workflow/assets/example.html` in full first: it is a finished 1
 python3 /workspace/workflow/scripts/render_html.py /tmp/video/index.html --check
 ```
 
-It seeks through the whole video and reports script errors, text leaving the frame or overflowing its box, text overlapping other text in a scene, icon names that do not exist and a length outside 8 to 12.5 s, each with the time it starts. Fix every problem and check again until it prints `"ok": true`. It also writes `/tmp/video/stills.png`, eight frames across the video: look at it if you can view images, and fix anything empty, crowded or unreadable.
+It seeks through the whole video and reports script errors, text leaving the frame or overflowing its box, text overlapping other text in a scene, icon names that do not exist, a scene whose figure stays small, and a length outside 8 to 12.5 s, each with the time it starts. Fix every problem and check again until it prints `"ok": true`. It also writes `/tmp/video/stills.png`, eight frames across the video: look at it if you can view images, and fix anything empty, crowded or unreadable.
 
 ### 5. Render
 
