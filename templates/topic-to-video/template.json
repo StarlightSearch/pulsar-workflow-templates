@@ -2,7 +2,7 @@
   "slug": "topic-to-video",
   "title": "Topic to video",
   "category": "media",
-  "summary": "Turns any topic into a 10-second explainer video with animated titles, bullet points, a statistic and a chart, ready to post.",
+  "summary": "Turns any topic into a 10-second motion-graphics video with kinetic type, animated charts and real transitions, ready to post.",
   "takes": "A topic, in a word or a sentence",
   "gives": "A 10-second MP4 and a poster image",
   "icon": "slides",
