@@ -779,7 +779,8 @@ class Backdrop:
             (1 - 0.08 * np.clip(dist, 0, 1) ** 2)[..., None]
         rng = np.random.default_rng(7)
         amp = 3.5 if p["light"] else 4.5
-        self.grain = [rng.normal(0, amp, (H, W, 1)).astype(np.float32) for _ in range(4)]
+        # Fixed grain: noise that changes every frame would cost the encoder ~6x the file size.
+        self.grain = rng.normal(0, amp, (H, W, 1)).astype(np.float32)
 
     def field(self, tsec: float) -> Image.Image:
         img = self.base.copy()
@@ -798,7 +799,7 @@ class Backdrop:
         return out
 
     def finish(self, frame: Image.Image, i: int) -> Image.Image:
-        arr = np.asarray(frame, np.float32) * self.vignette + self.grain[(i // 2) % len(self.grain)]
+        arr = np.asarray(frame, np.float32) * self.vignette + self.grain
         return Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
 
 
@@ -901,7 +902,7 @@ def render(plan: dict, out: str, poster: str | None) -> None:
     n = int(round(plan["_total"] * FPS))
     backdrop = Backdrop(plan["_palette"], plan["_total"])
     cmd = [ffmpeg_path(), "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
-           "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-preset", "medium", "-crf", "19",
+           "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-preset", "medium", "-crf", "21",
            "-pix_fmt", "yuv420p", "-movflags", "+faststart", out]
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     try:
