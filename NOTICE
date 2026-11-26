@@ -18,6 +18,7 @@ This product includes templates adapted from the sources below. One line per ada
 - templates/page-audit: adapted from coreyhaines31/marketingskills, skills/seo-audit and skills/copywriting (https://github.com/coreyhaines31/marketingskills/tree/main/skills), MIT.
 - templates/competitor-profile: adapted from coreyhaines31/marketingskills, skills/competitor-profiling (https://github.com/coreyhaines31/marketingskills/tree/main/skills/competitor-profiling), MIT.
 - templates/topic-to-video/fonts: the Geist typeface (https://github.com/vercel/geist-font), Copyright 2024 The Geist Project Authors, SIL Open Font License 1.1, whose text travels with the fonts in templates/topic-to-video/fonts/OFL.txt.
+- templates/topic-to-video/fonts/Phosphor-Fill.ttf and assets/icons.css: Phosphor Icons (https://github.com/phosphor-icons/web), Copyright (c) 2020-2021 Phosphor Icons, MIT, notice in templates/topic-to-video/fonts/Phosphor-LICENSE.txt.
 
 The MIT-licensed sources above (coreyhaines31/marketingskills, Copyright (c) 2025 Corey Haines) require their copyright and permission notice to travel with adapted copies. It is reproduced in LICENSES/marketingskills-MIT.txt.
 

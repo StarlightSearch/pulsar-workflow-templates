@@ -1,0 +1,201 @@
+<!doctype html>
+<!--
+  A finished 10-second video page, as an example to adapt. Every scene has a figure drawn
+  with SVG and icons, and everything moves on one paused GSAP timeline (Stage.ready at the end).
+  Keep: #stage at 1280x720, the four <script>/<link> includes, Stage.ready(tl).
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="icons.css">
+<style>
+  @font-face { font-family: "Geist"; src: url("fonts/Geist-Medium.ttf"); font-weight: 500; }
+  @font-face { font-family: "Geist"; src: url("fonts/Geist-Bold.ttf"); font-weight: 700; }
+  @font-face { font-family: "Geist"; src: url("fonts/Geist-Black.ttf"); font-weight: 900; }
+  :root {
+    --bg: #0b1620; --bg2: #12324a; --fg: #ffffff; --muted: #b9c6d2;
+    --accent: #f5b83d; --accent2: #3ec5d3; --ink: #1a1206;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1280px; height: 720px; overflow: hidden; background: var(--bg); }
+  #stage { position: relative; width: 1280px; height: 720px; overflow: hidden; font-family: "Geist", sans-serif; color: var(--fg);
+           background: radial-gradient(120% 90% at 20% 0%, var(--bg2), var(--bg) 70%); }
+  .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .45; }
+  .grain { position: absolute; inset: 0; opacity: .07; pointer-events: none; mix-blend-mode: overlay; }
+  .scene { position: absolute; inset: 0; visibility: hidden; }
+  .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .08em; }
+  .w > span { display: inline-block; }
+  .kicker { display: inline-block; padding: 8px 18px; border: 2px solid var(--accent); border-radius: 999px;
+            color: var(--accent); font: 700 22px Geist; letter-spacing: .12em; text-transform: uppercase; }
+  h1 { font: 900 92px/1.02 Geist; letter-spacing: -.02em; }
+  h2 { font: 900 60px/1.05 Geist; letter-spacing: -.015em; }
+  .sub { font: 500 32px/1.3 Geist; color: var(--muted); }
+  .label { font: 700 26px/1.2 Geist; text-align: center; }
+  .accent { color: var(--accent); }
+  .node { position: absolute; width: 150px; height: 150px; border-radius: 50%; background: var(--accent);
+          display: grid; place-items: center; color: var(--ink); font-size: 84px; }
+  .dot { position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: var(--accent2); }
+  .btn { display: inline-block; padding: 18px 40px; border-radius: 999px; background: var(--ink); color: var(--accent);
+         font: 700 32px Geist; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="blob" id="b1" style="width:620px;height:620px;left:700px;top:-260px;background:var(--accent2)"></div>
+  <div class="blob" id="b2" style="width:520px;height:520px;left:-200px;top:380px;background:var(--accent)"></div>
+  <svg class="grain" width="1280" height="720"><filter id="n"><feTurbulence baseFrequency=".9" numOctaves="2" seed="4"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>
+
+  <!-- 1. Title: headline on the left, a honeycomb drawing itself on the right, a bee flying across it -->
+  <section class="scene" id="s1">
+    <div style="position:absolute;left:100px;top:210px;width:620px">
+      <div class="kicker" id="s1k">Nature</div>
+      <h1 id="s1h" style="margin-top:26px">Why bees <span class="accent">matter</span></h1>
+      <p class="sub" id="s1s" style="margin-top:22px">The tiny workers behind your breakfast</p>
+    </div>
+    <svg id="comb" width="520" height="560" viewBox="0 0 520 560" style="position:absolute;left:720px;top:80px"></svg>
+    <svg width="1280" height="720" style="position:absolute;inset:0;overflow:visible">
+      <path id="flight" d="M 760 640 C 880 520, 1180 560, 1080 380 S 860 180, 1010 110" fill="none" stroke="none"/>
+    </svg>
+    <div id="bee" style="position:absolute;transform:translate(-50%,-50%)">
+      <svg viewBox="-40 -30 80 60" width="132" height="99" style="overflow:visible">
+        <ellipse class="wing" cx="-6" cy="-16" rx="13" ry="18" fill="rgba(255,255,255,.75)" transform="rotate(-25)"/>
+        <ellipse class="wing" cx="8" cy="-16" rx="11" ry="16" fill="rgba(255,255,255,.6)" transform="rotate(20)"/>
+        <ellipse cx="0" cy="4" rx="26" ry="17" fill="#f5b83d"/>
+        <path d="M -9 -11 v 30 M 4 -13 v 34" stroke="#1a1206" stroke-width="7"/>
+        <circle cx="24" cy="1" r="9" fill="#1a1206"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 2. A number as a donut that draws itself, and a pictogram of crops lighting up -->
+  <section class="scene" id="s2">
+    <svg width="360" height="360" viewBox="0 0 360 360" style="position:absolute;left:110px;top:180px">
+      <circle cx="180" cy="180" r="150" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="34"/>
+      <circle id="ring" cx="180" cy="180" r="150" fill="none" stroke="var(--accent)" stroke-width="34" stroke-linecap="round"
+              transform="rotate(-90 180 180)"/>
+    </svg>
+    <div id="num" style="position:absolute;left:110px;top:300px;width:360px;text-align:center;font:900 96px Geist">0%</div>
+    <div style="position:absolute;left:560px;top:190px;width:620px">
+      <h2 id="s2h">of food crops need pollinators</h2>
+      <div id="grid" style="display:grid;grid-template-columns:repeat(10,1fr);gap:14px;margin-top:40px"></div>
+      <p class="sub" id="s2s" style="margin-top:28px;font-size:24px">Source: FAO, 2016</p>
+    </div>
+  </section>
+
+  <!-- 3. A process as a diagram: nodes pop in, the paths between them draw, pollen travels along them -->
+  <section class="scene" id="s3">
+    <h2 id="s3h" style="position:absolute;left:0;right:0;top:80px;text-align:center">How a flower becomes fruit</h2>
+    <svg width="1280" height="720" style="position:absolute;inset:0">
+      <path id="p1" d="M 340 390 C 440 300, 540 300, 640 390" fill="none" stroke="var(--accent2)" stroke-width="5"/>
+      <path id="p2" d="M 640 390 C 740 300, 840 300, 940 390" fill="none" stroke="var(--accent2)" stroke-width="5"/>
+    </svg>
+    <div class="node" id="n1" style="left:265px;top:315px"><i class="ph ph-flower"></i></div>
+    <div class="node" id="n2" style="left:565px;top:315px">
+      <svg viewBox="-40 -30 80 60" width="124" height="93" style="overflow:visible">
+        <ellipse class="wing" cx="-6" cy="-16" rx="13" ry="18" fill="rgba(255,255,255,.75)" transform="rotate(-25)"/>
+        <ellipse class="wing" cx="8" cy="-16" rx="11" ry="16" fill="rgba(255,255,255,.6)" transform="rotate(20)"/>
+        <ellipse cx="0" cy="4" rx="26" ry="17" fill="#f5b83d"/>
+        <path d="M -9 -11 v 30 M 4 -13 v 34" stroke="#1a1206" stroke-width="7"/>
+        <circle cx="24" cy="1" r="9" fill="#1a1206"/>
+      </svg>
+    </div>
+    <div class="node" id="n3" style="left:865px;top:315px"><i class="ph ph-orange-slice"></i></div>
+    <div class="dot" id="d1"></div><div class="dot" id="d2"></div>
+    <div class="label" id="l1" style="position:absolute;left:215px;top:500px;width:250px">Flower makes pollen</div>
+    <div class="label" id="l2" style="position:absolute;left:515px;top:500px;width:250px">Bee carries it</div>
+    <div class="label" id="l3" style="position:absolute;left:815px;top:500px;width:250px">Fruit grows</div>
+  </section>
+
+  <!-- 4. Closing: an accent circle wipes over everything, the action pops in as a button -->
+  <section class="scene" id="s4">
+    <div id="wipe" style="position:absolute;inset:0;background:var(--accent);clip-path:circle(0% at 50% 50%)"></div>
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink)">
+      <i class="ph ph-plant" id="s4i" style="font-size:110px"></i>
+      <h1 id="s4h" style="margin-top:10px">Protect the pollinators</h1>
+      <div class="btn" id="s4b" style="margin-top:36px">Plant wildflowers</div>
+    </div>
+  </section>
+</div>
+
+<script src="gsap.min.js"></script>
+<script src="stage.js"></script>
+<script>
+const tl = gsap.timeline({ paused: true, defaults: { ease: "power3.out" } });
+const $ = (id) => document.getElementById(id);
+
+// Background drifts for the whole video.
+tl.to("#b1", { x: -260, y: 120, duration: 10.5, ease: "sine.inOut" }, 0)
+  .to("#b2", { x: 300, y: -90, duration: 10.5, ease: "sine.inOut" }, 0);
+
+// 1. Title
+const comb = $("comb"), cells = [];
+const R = 52, H = Math.sqrt(3) * R;
+for (let row = 0; row < 5; row++) for (let col = 0; col < 4; col++) {
+  const cx = 80 + col * 1.5 * R, cy = 70 + row * H + (col % 2 ? H / 2 : 0);
+  const pts = [...Array(6)].map((_, k) => `${cx + R * Math.cos(Math.PI / 3 * k)},${cy + R * Math.sin(Math.PI / 3 * k)}`).join(" ");
+  const p = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+  p.setAttribute("points", pts);
+  p.setAttribute("fill", "var(--accent)"); p.setAttribute("fill-opacity", "0");
+  p.setAttribute("stroke", "var(--accent)"); p.setAttribute("stroke-width", "3");
+  comb.appendChild(p); cells.push(p);
+}
+Stage.scene(tl, "#s1", 0);
+tl.from("#s1k", { autoAlpha: 0, x: -30, duration: .5 }, .1)
+  .from(Stage.words($("s1h")), { yPercent: 110, duration: .7, stagger: .08 }, .2)
+  .from("#s1s", { autoAlpha: 0, y: 20, duration: .6 }, .7);
+cells.forEach((c, i) => {
+  const len = Stage.draw(c);
+  tl.to(c, { strokeDashoffset: 0, duration: .6, ease: "power2.inOut" }, .1 + i * .035);
+});
+tl.to(gsap.utils.shuffle(cells.slice()).slice(0, 7), { attr: { "fill-opacity": .9 }, duration: .4, stagger: .07 }, .9);
+tl.from("#bee", { autoAlpha: 0, scale: .3, duration: .4 }, .2);
+Stage.along(tl, $("bee"), $("flight"), .2, 2.0);
+tl.to("#comb", { scale: 1.06, transformOrigin: "50% 50%", duration: 2.4, ease: "none" }, 0);
+
+// 2. Stat: slide the title out, the stat in
+tl.to("#s1", { xPercent: -30, autoAlpha: 0, duration: .6, ease: "power2.in" }, 2.2);
+Stage.scene(tl, "#s2", 2.4);
+const ringLen = Stage.draw($("ring"));
+tl.from("#s2", { xPercent: 20, duration: .7 }, 2.4)
+  .to("#ring", { strokeDashoffset: ringLen * .25, duration: 1.3, ease: "expo.out" }, 2.6);
+Stage.count(tl, $("num"), 75, 2.6, { suffix: "%", duration: 1.3 });
+tl.from(Stage.words($("s2h")), { yPercent: 110, duration: .6, stagger: .05 }, 2.6);
+const grid = $("grid"), plants = [];
+for (let i = 0; i < 20; i++) {
+  const ic = document.createElement("i");
+  ic.className = "ph ph-plant";
+  ic.style.cssText = "font-size:50px;color:rgba(255,255,255,.18)";
+  grid.appendChild(ic); plants.push(ic);
+}
+tl.from(plants, { scale: 0, duration: .35, stagger: .025, ease: "back.out(2)" }, 2.9)
+  .to(plants.slice(0, 15), { color: "var(--accent)", duration: .2, stagger: .04 }, 3.4)
+  .from("#s2s", { autoAlpha: 0, duration: .5 }, 3.6);
+
+// 3. Diagram: wipe in from the right
+tl.fromTo("#s3", { clipPath: "inset(0 0 0 100%)" }, { clipPath: "inset(0 0 0 0%)", duration: .7, ease: "power3.inOut" }, 4.8);
+Stage.scene(tl, "#s3", 4.8);
+tl.from(Stage.words($("s3h")), { yPercent: 110, duration: .6, stagger: .06 }, 5.1);
+["#n1", "#n2", "#n3"].forEach((n, i) => tl.from(n, { scale: 0, duration: .5, ease: "back.out(1.8)" }, 5.3 + i * .55));
+["#l1", "#l2", "#l3"].forEach((l, i) => tl.from(l, { autoAlpha: 0, y: 16, duration: .4 }, 5.45 + i * .55));
+[["p1", "d1", 5.6], ["p2", "d2", 6.15]].forEach(([p, d, at]) => {
+  const len = Stage.draw($(p));
+  tl.to($(p), { strokeDashoffset: 0, duration: .5, ease: "power2.inOut" }, at);
+  tl.from($(d), { autoAlpha: 0, duration: .1 }, at);
+  Stage.along(tl, $(d), $(p), at, .9);
+});
+tl.to("#n2", { y: -10, duration: .5, yoyo: true, repeat: 3, ease: "sine.inOut" }, 6.4);
+// Wings flap for the whole video (a drawn bee, since the icon set has none).
+tl.to(".wing", { scaleY: .35, transformOrigin: "50% 100%", duration: .06, yoyo: true, repeat: 170, ease: "none" }, 0);
+
+// 4. Closing
+Stage.scene(tl, "#s4", 8.2);
+tl.to("#wipe", { clipPath: "circle(80% at 50% 50%)", duration: .8, ease: "power3.inOut" }, 8.2)
+  .from("#s4i", { scale: 0, rotation: -30, duration: .6, ease: "back.out(2)" }, 8.6)
+  .from(Stage.words($("s4h")), { yPercent: 110, duration: .6, stagger: .07 }, 8.7)
+  .from("#s4b", { scale: 0, duration: .5, ease: "back.out(2.2)" }, 9.2)
+  .to({}, { duration: .8 }, 9.7);   // hold the last frame until 10.5 s
+
+Stage.ready(tl);
+</script>
+</body>
+</html>

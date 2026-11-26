@@ -2,10 +2,10 @@
   "slug": "topic-to-video",
   "title": "Topic to video",
   "category": "media",
-  "summary": "Turns any topic into a 10-second motion-graphics video with kinetic type, animated charts and real transitions, ready to post.",
+  "summary": "Turns any topic into a 10-second motion-graphics video: diagrams that draw themselves, charts that grow and animated illustrations, ready to post.",
   "takes": "A topic, in a word or a sentence",
   "gives": "A 10-second MP4 and a poster image",
   "icon": "slides",
-  "needs": { "web": false, "connections": [], "secrets": [] },
+  "needs": { "web": true, "connections": [], "secrets": [] },
   "targets": ["workflows"]
 }

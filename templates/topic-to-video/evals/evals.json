@@ -7,8 +7,8 @@
         "output.json status is ok and seconds is between 9.5 and 10.5",
         "/workspace/out has video.mp4 and poster.png",
         "The scenes open with a title scene and end with a closing scene",
-        "Between the title and the closing there are at least three different scene types, and at most one bullets scene",
-        "The plan sets a style",
+        "Every scene is built around a figure (a diagram, chart, illustration or icons), not text alone",
+        "The answer does not say the fallback renderer was used",
         "Every number in the scenes has a source in sources"
       ]
     },
