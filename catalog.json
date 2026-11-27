@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "commit": "a221302b99a06c17e2d3e8c405de2d230f47eae7",
-  "builtAt": "2026-11-27T13:32:56.232Z",
+  "commit": "8eb6526d20a8ee45b0703f1dbd1d533509102cdd",
+  "builtAt": "2026-11-27T14:07:27.239Z",
   "categories": [
     {
       "id": "documents",
@@ -735,8 +735,8 @@
       "files": [
         {
           "path": "SKILL.md",
-          "size": 8715,
-          "sha256": "81dae7e136c851c8fae28a48890a13c95842a049fb8fa05fa571507f46e43dbd"
+          "size": 8770,
+          "sha256": "9020b0c801af5e4f757998a101d0a46fdaad2de6c1c4b2bd8db5bfb919b8dee5"
         },
         {
           "path": "assets/example.html",
@@ -805,8 +805,8 @@
         },
         {
           "path": "scripts/setup_browser.sh",
-          "size": 3924,
-          "sha256": "2c61dd672baa33a43a0aec010788b53ed1ef5e4843b6649ab66091ff2bbe0173"
+          "size": 4500,
+          "sha256": "2e5b661d89cdf6395b46cebac0f1ae42a8db747170471e25653beb207b3973e0"
         }
       ]
     }
