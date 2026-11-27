@@ -7,6 +7,9 @@
 #
 # Copies the page helpers (assets/stage.js, assets/icons.css), the fonts and GSAP into the page folder and writes /tmp/video-browser-env.sh, which must be
 # sourced before render_html.py. The last line printed is BROWSER_OK or BROWSER_FAILED <reason>.
+#
+# A machine that already has Playwright and its Chromium (the Workflows sandbox image sets
+# PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright) downloads only GSAP and is ready in seconds.
 set -u
 
 DIR="${1:-/tmp/video}"
@@ -19,7 +22,12 @@ PY=/tmp/video/py
 LIBS=/tmp/video/libs
 APT=/tmp/video/apt
 LIB_PATH="$LIBS/usr/lib/x86_64-linux-gnu:$LIBS/lib/x86_64-linux-gnu"
-export PLAYWRIGHT_BROWSERS_PATH=/tmp/video/browsers
+# A browser that is already installed is used; otherwise one is downloaded into /tmp.
+if [ -z "${PLAYWRIGHT_BROWSERS_PATH:-}" ] && [ -d /opt/ms-playwright ]; then PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright; fi
+if ! find "${PLAYWRIGHT_BROWSERS_PATH:-/nonexistent}" -type f \( -name headless_shell -o -name chrome-headless-shell \) 2>/dev/null | grep -q .; then
+  PLAYWRIGHT_BROWSERS_PATH=/tmp/video/browsers
+fi
+export PLAYWRIGHT_BROWSERS_PATH
 export PYTHONPATH="$PY${PYTHONPATH:+:$PYTHONPATH}"
 NODE_BIN="$(command -v node || true)"
 # Playwright's bundled Node needs libatomic; the machine's own Node does not.

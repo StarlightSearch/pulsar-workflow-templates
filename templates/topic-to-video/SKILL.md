@@ -41,7 +41,7 @@ Makes a ten-second explainer about any topic as motion graphics: the run designs
 bash /workspace/workflow/scripts/setup_browser.sh /tmp/video
 ```
 
-It copies the page helpers, the icon stylesheet and the fonts into /tmp/video, and downloads a headless Chromium, its libraries and GSAP into /tmp (about a minute). The last line is `BROWSER_OK` or `BROWSER_FAILED <reason>`. On `BROWSER_FAILED`, run the script once more; if it fails again, make the video with the fallback in step 6 instead.
+It copies the page helpers, the icon stylesheet and the fonts into /tmp/video, and downloads GSAP, and a headless Chromium with its libraries into /tmp when the machine has none (about a minute then; seconds otherwise). The last line is `BROWSER_OK` or `BROWSER_FAILED <reason>`. On `BROWSER_FAILED`, run the script once more; if it fails again, make the video with the fallback in step 6 instead.
 
 If the topic asks for something hateful, sexual, violent, about a real private person, or presents claims as fact that are false, do not make the video: write output.json with status `refused`, null files and the reason as the only scene, and say why.
 
