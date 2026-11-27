@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "commit": "92f0d6fa47b59a742d5e402901913e00cd3f277d",
-  "builtAt": "2026-11-25T17:26:12.747Z",
+  "commit": "a221302b99a06c17e2d3e8c405de2d230f47eae7",
+  "builtAt": "2026-11-27T13:32:56.232Z",
   "categories": [
     {
       "id": "documents",
@@ -712,12 +712,12 @@
       "slug": "topic-to-video",
       "title": "Topic to video",
       "category": "media",
-      "summary": "Turns any topic into a 10-second explainer video with animated titles, bullet points, a statistic and a chart, ready to post.",
+      "summary": "Turns any topic into a 10-second motion-graphics video: diagrams that draw themselves, charts that grow and animated illustrations, ready to post.",
       "takes": "A topic, in a word or a sentence",
       "gives": "A 10-second MP4 and a poster image",
       "icon": "slides",
       "needs": {
-        "web": false,
+        "web": true,
         "connections": [],
         "secrets": []
       },
@@ -725,25 +725,88 @@
         "workflows"
       ],
       "steps": [
-        "Plan the scenes",
+        "Set up",
+        "Storyboard",
+        "Build the page",
+        "Check",
         "Render",
         "Report"
       ],
       "files": [
         {
           "path": "SKILL.md",
-          "size": 4590,
-          "sha256": "501fe4176f32029ef69bd3588c6f2fc11f95be5130afbc53fbe9133d9d49ed57"
+          "size": 8715,
+          "sha256": "81dae7e136c851c8fae28a48890a13c95842a049fb8fa05fa571507f46e43dbd"
+        },
+        {
+          "path": "assets/example.html",
+          "size": 12104,
+          "sha256": "4f759b842ecfdf8fbb26fe56ccbae2e9259fcf521b89edcfed3d7388edf16ccd"
+        },
+        {
+          "path": "assets/icon-names.txt",
+          "size": 18947,
+          "sha256": "5113a05012cb13846136391f672fcede543f52df6020977522149d1fcba434d2"
+        },
+        {
+          "path": "assets/icons.css",
+          "size": 62062,
+          "sha256": "3a1cc091b4b811230e9e44ed955501768996fc7a4eb849f231321700502025c5"
+        },
+        {
+          "path": "assets/stage.js",
+          "size": 3940,
+          "sha256": "19d531298d5981587c78124572796c8129c01a174570cb471eb408e010cf401f"
         },
         {
           "path": "evals/evals.json",
-          "size": 740,
-          "sha256": "889475357c06a195118948c939a3731a34fafd112fa8499f4e99cdfc5595f70e"
+          "size": 912,
+          "sha256": "1549f5fa1c409a7eae23521fd0a2928acafc9da92427b668900d8812ae8ffbe5"
+        },
+        {
+          "path": "fonts/Geist-Black.ttf",
+          "size": 130508,
+          "sha256": "558a58b06cd4cbc57117fae2f905648f0d7c88d89bbdb497d64d5317b1b19a36"
+        },
+        {
+          "path": "fonts/Geist-Bold.ttf",
+          "size": 128824,
+          "sha256": "3f21f02b827228c3f0c5fb230d027b5a1a263013618e8052bc1b3c5692812c88"
+        },
+        {
+          "path": "fonts/Geist-Medium.ttf",
+          "size": 127660,
+          "sha256": "3a3b36f0d0b981f4857f7f00eeef4a5ee123605575d362ab31ee7c19e3d11f2f"
+        },
+        {
+          "path": "fonts/OFL.txt",
+          "size": 4384,
+          "sha256": "021caa749f89fecd7c2e40a50499de29e84d2bc19251659b47d499c2fbfffc17"
+        },
+        {
+          "path": "fonts/Phosphor-Fill.ttf",
+          "size": 449252,
+          "sha256": "a53f5d2630cab5e3b7536ecb9d69d71519a2190298c22b1f8d770dd37bc2940a"
+        },
+        {
+          "path": "fonts/Phosphor-LICENSE.txt",
+          "size": 1076,
+          "sha256": "687fbe52d0eb5c2353eca27a4037e889145ee0b584d3b1abf67581c4a4a4e47c"
+        },
+        {
+          "path": "scripts/render_html.py",
+          "size": 12040,
+          "sha256": "734fd715a5e368d59e3be6e74924c69c8846a1d6e9ba3bf03648a65fe7c9c6ac"
         },
         {
           "path": "scripts/render_video.py",
-          "size": 16641,
-          "sha256": "69e4c299671dfa6d0dbaeb08dc0fbc4ba21c47941b810cf49e7cc19cac0ba192"
+          "size": 40037,
+          "sha256": "139119bdf85f7833b61853f438c7cb4528dd72b3987f8f0a67fe6b93bbed431e"
+        },
+        {
+          "path": "scripts/setup_browser.sh",
+          "size": 3924,
+          "sha256": "2c61dd672baa33a43a0aec010788b53ed1ef5e4843b6649ab66091ff2bbe0173"
         }
       ]
     }
